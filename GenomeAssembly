@@ -126,4 +126,6 @@ samtools sort -@16 HypoSR_30.bam -o HypoSR_30_sorted.bam
 samtools fastq -@16 -1 ToadRem_1.fastq -2 ToadRem_2.fastq RemoveToad_sorted.bam
 
 
+samtools depth -@ 16 HypoSR_30_sorted.bam | awk '{sum+=$3} END { print "Average = ",sum/253486815}'
 
+hypo -t 24 -r @il_names.txt -d BlobCleaned_Flye_Assembly.fasta -b HypoSR_30_sorted.bam -c 60.6509 -s 253m -B HypoLR_sorted.bam -p 96 -o hypo.fa
