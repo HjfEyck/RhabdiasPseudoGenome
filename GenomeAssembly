@@ -118,3 +118,12 @@ seqtk subseq InitialFlyeAssembly.fasta seqsToKeep.txt > BlobCleaned_Flye_Assembl
 grep ">" BlobCleaned_Flye_Assembly.fasta | cut -c2- > CleanedFastaNames.txt
 
 ###################################### Bringing it together, polishing ONTreads with Illumina data ######################################
+
+#run job
+$MINI/minimap2 -t 16 -a -x sr $TOADGEN/canetoad.v3.8b.plusmt.fasta Rhab_forward.fastq Rhab_reverse.fastq > RemoveToad.sam
+samtools view -@ 16 -S -b HypoSR_30.sam > HypoSR_30.bam
+samtools sort -@16 HypoSR_30.bam -o HypoSR_30_sorted.bam
+samtools fastq -@16 -1 ToadRem_1.fastq -2 ToadRem_2.fastq RemoveToad_sorted.bam
+
+
+
