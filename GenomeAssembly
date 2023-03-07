@@ -94,7 +94,7 @@ samtools sort -@16 blobtools.bam -o blobtools_sorted.bam
 blobtools create \
     --fasta InitialFlyeAssembly.fasta \
     --taxdump $TAX/ \
-    ./BLOBDATABASE/ASSEMBLY_NAME
+    ./BLOBDATABASE/InitialFlyeAssembly.fasta
 
 #add blast hits to blobtools database
 blobtools add \
@@ -110,5 +110,11 @@ blobtools add \
 
 #generate table for examination
 blobtools filter --table ONT_blob.table.tsv ./BLOBDATABASE/InitialFlyeAssembly.fasta
+
+#Filter contigs using seqtk
+# seqsToKeep.txt only contains sequences with nematode or no hit designations
+seqtk subseq InitialFlyeAssembly.fasta seqsToKeep.txt > BlobCleaned_Flye_Assembly.fasta
+#Check the correct contigs were removed
+grep ">" BlobCleaned_Flye_Assembly.fasta | cut -c2- > CleanedFastaNames.txt
 
 ###################################### Bringing it together, polishing ONTreads with Illumina data ######################################
