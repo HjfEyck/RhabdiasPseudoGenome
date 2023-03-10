@@ -1,0 +1,10 @@
+module load java/8u292-b10-openjdk
+MC=/srv/scratch/z5228384/tools/macse
+BMGE='/srv/scratch/z5228384/condaACTUAL/miniconda3/share/bmge-1.12-1'
+export JAVA_TOOL_OPTIONS=-Xmx80g
+export _JAVA_OPTIONS=-Xmx80g
+
+java -jar $MC/macse_v2.06.jar -prog alignSequences -seq COX1.fasta -out_NT COX1_macse_NT.fasta -out_AA COX1_macse_AA.fasta -gc_def 5
+
+
+java -jar $BMGE/BMGE.jar -i COX1_macse_AA.fasta -t AA -m BLOSUM62 -of COX1_macse_BMGE_AA.fasta
