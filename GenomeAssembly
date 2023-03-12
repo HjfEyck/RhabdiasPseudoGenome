@@ -138,7 +138,7 @@ p prints the resulting line
 $MINI/minimap2 -t 16 -a -x sr BlobCleaned_Flye_Assembly.fasta Rhab_forward.fastq Rhab_reverse.fastq > HypoSR.sam
 samtools view -@ 16 -S -b HypoSR.sam > HypoSR.bam
 samtools sort -@16 HypoSR.bam -o HypoSR_sorted.bam
-$MINI/minimap2 -t 16 -a -x ont-map BlobCleaned_Flye_Assembly.fasta rhabont_allreads_5000.fastq > HypoLR.sam
+$MINI/minimap2 -t 16 -a -x map-ont BlobCleaned_Flye_Assembly.fasta rhabont_allreads_5000.fastq > HypoLR.sam
 samtools view -@ 16 -S -b HypoLR.sam > HypoLR.bam
 samtools sort -@16 HypoLR.bam -o HypoLR_sorted.bam
 #get an estimation of short read depth for hypo. 253486815 is a previously estimated genome size
