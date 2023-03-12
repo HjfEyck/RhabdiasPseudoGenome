@@ -1,8 +1,21 @@
+
+#create environment
 module load java/8u292-b10-openjdk
 MC=/srv/scratch/z5228384/tools/macse
 BMGE='/srv/scratch/z5228384/condaACTUAL/miniconda3/share/bmge-1.12-1'
 export JAVA_TOOL_OPTIONS=-Xmx80g
 export _JAVA_OPTIONS=-Xmx80g
+conda create -n ncbi_env
+conda activate ncbi_env
+conda install -c bioconda entrez-direct
+
+
+#Fetch the sequences we will use
+esearch -db "protein" -query "(("Nematoda"[Organism] OR nematoda[All Fields]) AND cox1[All Fields]) AND (refseq[filter] AND mitochondrion[filter])" | efetch -format fasta > cox1_aa.fasta
+
+#convert seequences into nucleotides
+pip3 install biopython
+
 
 java -jar $MC/macse_v2.06.jar -prog alignSequences -seq COX1.fasta -out_NT COX1_macse_NT.fasta -out_AA COX1_macse_AA.fasta -gc_def 5
 
