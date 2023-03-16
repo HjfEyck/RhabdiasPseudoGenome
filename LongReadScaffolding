@@ -1,0 +1,16 @@
+Some different scaffolding approaches that I ran on the R. pseudosphaerocephala assembled contigs
+
+########################################## LongStitch ##########################################
+
+# create environment + install dependencies
+conda create -n longstitch_env
+conda activate longstitch_env
+conda install -c bioconda tigmint ntlink arcs abyss
+conda install -c bioconda -c conda-forge links
+LSTITCH=/srv/scratch/z5228384/tools/longstitch-1.0.4
+
+# navigate to directory
+cd /srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30
+
+# Run longstitch for scaffolding
+$LSTITCH/longstitch run draft=DipFirst_hypo reads=rhabont_allreads_5000 G=253486815 t=24
