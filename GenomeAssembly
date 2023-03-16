@@ -1,4 +1,4 @@
-
+This details the initail contig assembly and polishing of the R. pseudosphaerocephala genome
 
 
 ###################################### initial assembly of ONT reads ######################################
@@ -17,55 +17,6 @@ cd /srv/scratch/z5228384/RhabGenomePaper/ONTreads
 #Prior to this step, reads less than 5000bp were trimmed.
 
 python $FLYE/flye --nano-raw rhabont_allreads_5000.fastq --out-dir $OUTDIR --genome-size 253m --threads 24
-
-
-###################################### Removing toad reads from Illumina data ######################################
-
-#Create Katana workspace
-module purge
-module load samtools/1.15.1
-MINI=/srv/scratch/z5228384/tools/minimap2
-TOADGEN=/srv/scratch/z5228384/Toadgenome
-
-#navigate to working directory
-cd /srv/scratch/z5228384/RhabGenomePaper/IlluminaReads
-
-#run job
-$MINI/minimap2 -t 16 -a -x sr $TOADGEN/canetoad.v3.8b.plusmt.fasta Rhab_forward.fastq Rhab_reverse.fastq > RemoveToad.sam
-samtools view -@ 16 -S -b -f 4 RemoveToad.sam > RemoveToad.bam
-samtools sort -@16 RemoveToad.bam -o RemoveToad_sorted.bam
-samtools fastq -@16 -1 ToadRem_1.fastq -2 ToadRem_2.fastq RemoveToad_sorted.bam
-
-samtools fastq -@ 16 RemoveToad_sorted.bam \
--1 ${RemoveToad_sorted.bam}"_R1.fastq.gz" \
--2 ${RemoveToad_sorted.bam}"_R2.fastq.gz" \
--0 /dev/null -s /dev/null -n
-
-
-###################################### Assessment and trimming of Illumina reads ######################################
-
-#Create Katana workspace
-module purge
-module load fastqc/0.11.9
-module load java/8u292-b10-openjdk
-TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
-
-fastqc -t 16 ToadRem_1.fastq
-fastqc -t 16 ToadRem_2.fastq
-
-#based on the fastqc results, the decision was made to trim the reads to 130bp in length, and headcrop the first 15bp off each read.
-#The decision to remove all reads below quality score 30 was made because these reads were to be used for polishing, and therefore need to be of high accuracy.
-#Furthermore, most reads were above quality score of 30, meaning this did not discard too much of the sequences.
-
-#Navigate to working directory
-cd /srv/scratch/z5228384/RhabGenomePaper/IlluminaReads
-
-java -jar $TRIM/trimmomatic-0.39.jar PE -threads 16 ToadRem_1.fastq ToadRem_2.fastq RhabdiasCleanPairedF.fastq RhabdiasCleanUnpairedF.fastq RhabdiasCleanPairedR.fastq RhabdiasCleanUnpairedR.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10 CROP:130 HEADCROP:15 LEADING:30 TRAILING:30 SLIDINGWINDOW:5:30 AVGQUAL:30 MINLEN:50
-
-#then re-checked the reads to assess trimming was effective
-fastqc -t 16 RhabdiasCleanPairedF.fastq
-fastqc -t 16 RhabdiasCleanPairedR.fastq
-
 
 ###################################### Using blobtools to remove contaminants in ONTdata ######################################
 
@@ -132,7 +83,53 @@ s/^([^\t]+\t){1}([^[:space:]]+).*/\2/ replaces the entire line with the second f
 
 p prints the resulting line
 
-###################################### Bringing it together, polishing ONTreads with Illumina data ######################################
+###################################### Removing toad reads from Illumina data ######################################
+
+#Create Katana workspace
+module purge
+module load samtools/1.15.1
+MINI=/srv/scratch/z5228384/tools/minimap2
+TOADGEN=/srv/scratch/z5228384/Toadgenome
+
+#navigate to working directory
+cd /srv/scratch/z5228384/RhabGenomePaper/IlluminaReads
+
+#run job
+$MINI/minimap2 -t 16 -a -x sr $TOADGEN/canetoad.v3.8b.plusmt.fasta Rhab_forward.fastq Rhab_reverse.fastq > RemoveToad.sam
+samtools view -@ 16 -S -b -f 4 RemoveToad.sam > RemoveToad.bam
+samtools sort -@16 RemoveToad.bam -o RemoveToad_sorted.bam
+samtools fastq -@16 -1 ToadRem_1.fastq -2 ToadRem_2.fastq RemoveToad_sorted.bam
+
+samtools fastq -@ 16 RemoveToad_sorted.bam \
+-1 ${RemoveToad_sorted.bam}"_R1.fastq.gz" \
+-2 ${RemoveToad_sorted.bam}"_R2.fastq.gz" \
+-0 /dev/null -s /dev/null -n
+
+###################################### Assessment and trimming of Illumina reads ######################################
+
+#Create Katana workspace
+module purge
+module load fastqc/0.11.9
+module load java/8u292-b10-openjdk
+TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
+
+fastqc -t 16 ToadRem_1.fastq
+fastqc -t 16 ToadRem_2.fastq
+
+#based on the fastqc results, the decision was made to trim the reads to 130bp in length, and headcrop the first 15bp off each read.
+#The decision to remove all reads below quality score 30 was made because these reads were to be used for polishing, and therefore need to be of high accuracy.
+#Furthermore, most reads were above quality score of 30, meaning this did not discard too much of the sequences.
+
+#Navigate to working directory
+cd /srv/scratch/z5228384/RhabGenomePaper/IlluminaReads
+
+java -jar $TRIM/trimmomatic-0.39.jar PE -threads 16 ToadRem_1.fastq ToadRem_2.fastq RhabdiasCleanPairedF.fastq RhabdiasCleanUnpairedF.fastq RhabdiasCleanPairedR.fastq RhabdiasCleanUnpairedR.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10 CROP:130 HEADCROP:15 LEADING:30 TRAILING:30 SLIDINGWINDOW:5:30 AVGQUAL:30 MINLEN:50
+
+#then re-checked the reads to assess trimming was effective
+fastqc -t 16 RhabdiasCleanPairedF.fastq
+fastqc -t 16 RhabdiasCleanPairedR.fastq
+
+###################################### Polishing ONTreads with Short and Long read data using Hypo ######################################
 
 #map short and long reads to the assembly for hypo
 $MINI/minimap2 -t 16 -a -x sr BlobCleaned_Flye_Assembly.fasta Rhab_forward.fastq Rhab_reverse.fastq > HypoSR.sam
