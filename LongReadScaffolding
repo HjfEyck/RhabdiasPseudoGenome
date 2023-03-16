@@ -15,6 +15,9 @@ cd /srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30
 # Run longstitch for scaffolding
 $LSTITCH/longstitch run draft=DipFirst_hypo reads=rhabont_allreads_5000 G=253486815 t=24
 
+# scaffolded reads saved to
+DipFirst_hypo.k32.w100.tigmint-ntLink.longstitch-scaffolds.fa
+
 
 ########################################## sspace-longread ##########################################
 
