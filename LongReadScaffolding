@@ -14,3 +14,25 @@ cd /srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30
 
 # Run longstitch for scaffolding
 $LSTITCH/longstitch run draft=DipFirst_hypo reads=rhabont_allreads_5000 G=253486815 t=24
+
+
+########################################## sspace-longread ##########################################
+
+git clone https://github.com/Runsheng/sspace_longread.git
+cd sspace_longread
+conda activate sspace_env
+cpan
+force install Perl4::CoreLibs
+# easiest way to install blasr is conda
+conda install blasr
+# then create a soft link of the blasr to the same folder as the Sspace-Longread.pl
+which blasr
+cd /srv/scratch/z5228384/tools/sspace_longread
+ln -s /srv/scratch/z5228384/condaACTUAL/miniconda3/envs/sspace_env/bin/blasr /srv/scratch/z5228384/tools/sspace_longread
+ls -l blasr
+
+#create workspace
+SSPACE=/srv/scratch/z5228384/tools/sspace_longread
+module load perl
+
+perl $SSPACE/SSPACE-LongRead.pl -c DipFirst_hypo.fasta -p rhabont_allreads_5000.fastq -b Longreads_scaf -t 24
