@@ -1,5 +1,22 @@
 Some different scaffolding approaches that I ran on the R. pseudosphaerocephala assembled contigs
 
+First, contigs were assembled in mulitple different ways, because of this, had to check which was the best to use for scaffolding
+conda activate busco_env # busco version 5.4.4
+module load picard/2.26.2
+
+# note these are examples showing the code and settings I ran. This was performed on multiuple different contig assemblies with the same settings
+# picard CollectAlignmentSummaryMetrics was run on bam files mapped with minimp2/2.24 with both short reads and long reads independently
+# meaning 2 bam files were assesed using this tool for each assembly
+
+picard CollectAlignmentSummaryMetrics \
+-I DipFirst_hypo_30_SR_sorted.bam \
+-O DipFirst_hypo_30.stats \
+-R ../DipFirst_hypo.fa
+
+# Busco against nematoda_odb10
+busco -c 24 DipFirst_hypo_30.fa -l nematoda_odb10 --augustus -o DipFirst_hypo_30.fa -m geno
+
+
 ########################################## LongStitch ##########################################
 
 # create environment + install dependencies
@@ -38,4 +55,4 @@ ls -l blasr
 SSPACE=/srv/scratch/z5228384/tools/sspace_longread
 module load perl
 
-perl $SSPACE/SSPACE-LongRead.pl -c DipFirst_hypo.fasta -p rhabont_allreads_5000.fastq -b Longreads_scaf -t 24
+perl $SSPACE/SSPACE-LongRead.pl -c DipFirst_hypo.fasta -p rhabont_allreads_5000.fastq -b Longreads_scaf -t 30 # takes approx 9 and a half hours to run
