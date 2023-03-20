@@ -67,3 +67,31 @@ ALIGNMENTPATH=/srv/scratch/z5228384/RhabGenomePaper/Pre_scaffolding_contig_valid
 
 # Scaffold with
 java -jar $LRSCAF/LRScaf-1.1.10.jar -c DipFirst_hypo.fa -a LRSCAF.sam -t mm -o LRScaf -p 16
+
+
+
+
+
+########################################## Gapcloser ##########################################
+
+conda install -c bioconda pilon racon
+
+READS=/srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30/
+SSPACE=/srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30/sspace_output
+
+# First we need fastq into fasta
+cd /srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30/
+seqkit fq2fa in.fastq.gz -o out.fasta
+
+tgsgapcloser --thread 30 --scaff $SSPACE/scaffolds.fasta --reads $READS/rhabont_allreads_5000.fasta --output TGSgapCLOSED --racon /srv/scratch/z5228384/condaACTUAL/miniconda3/envs/gapfill_env/bin/racon
+
+
+YOUR-INSTALL-DIR/tgsgapcloser  \
+        --scaff  $SSPACE/scaffolds.fasta \
+        --reads  $READS/rhabont_allreads_5000.fasta \
+        --output TGSgapCloser \
+        --pilon  pilon-path/pilon-1.23.jar  \
+        --ngs    ngs-reads-path/ngs.reads.fastq.gz  \
+        --samtools samtools-path/bin/samtools  \
+        --java    java-path/bin/java \
+        >pipe.log 2>pipe.err
