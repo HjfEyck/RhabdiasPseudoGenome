@@ -56,3 +56,14 @@ SSPACE=/srv/scratch/z5228384/tools/sspace_longread
 module load perl
 
 perl $SSPACE/SSPACE-LongRead.pl -c DipFirst_hypo.fasta -p rhabont_allreads_5000.fastq -b Longreads_scaf -t 30 # takes approx 9 and a half hours to run
+
+########################################## LRScaf ##########################################
+
+# create environment
+LRSCAF=/srv/scratch/z5228384/tools/LRScaf
+module load java/8u292-b10-openjdk
+#requires long read alignment file, not raw reads, which we already have made with minimmap2
+ALIGNMENTPATH=/srv/scratch/z5228384/RhabGenomePaper/Pre_scaffolding_contig_validation/LRBam/
+
+# Scaffold with
+java -jar $LRSCAF/LRScaf-1.1.10.jar -c DipFirst_hypo.fa -a $ALIGNMENTPATH/DipFirst_hypo_30_sorted.bam -t mm -o LRScaf -p 16
