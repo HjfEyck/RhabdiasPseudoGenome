@@ -66,4 +66,4 @@ module load java/8u292-b10-openjdk
 ALIGNMENTPATH=/srv/scratch/z5228384/RhabGenomePaper/Pre_scaffolding_contig_validation/LRBam/
 
 # Scaffold with
-java -jar $LRSCAF/LRScaf-1.1.10.jar -c DipFirst_hypo.fa -a $ALIGNMENTPATH/DipFirst_hypo_30_sorted.bam -t mm -o LRScaf -p 16
+java -jar $LRSCAF/LRScaf-1.1.10.jar -c DipFirst_hypo.fa -a LRSCAF.sam -t mm -o LRScaf -p 16
