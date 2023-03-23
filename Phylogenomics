@@ -1,1 +1,3 @@
 151 reference nematode genome assemblies were taken from NCBI genbank. Only included sequences at the scaffold level or above from the 2010 or newer.
+
+find ./* -type f -exec cp -n {} . \;
