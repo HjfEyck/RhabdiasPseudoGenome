@@ -83,7 +83,7 @@ SSPACE=/srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30/ss
 cd /srv/scratch/z5228384/RhabGenomePaper/Dipl_First_pipe/DipFirst_Hypo_30/
 seqkit fq2fa in.fastq.gz -o out.fasta
 
-tgsgapcloser --thread 30 --scaff $SSPACE/scaffolds.fasta --reads $READS/rhabont_allreads_5000.fasta --output TGSgapCLOSED --racon /srv/scratch/z5228384/condaACTUAL/miniconda3/envs/gapfill_env/bin/racon
+tgsgapcloser --thread 30 --scaff $SSPACE/scaffolds.fasta --reads $READS/rhabont_allreads_5000.fasta --output TGSgapCLOSED --minmap_arg \' -t 30\' --racon /srv/scratch/z5228384/condaACTUAL/miniconda3/envs/gapfill_env/bin/racon
 
 
 YOUR-INSTALL-DIR/tgsgapcloser  \
