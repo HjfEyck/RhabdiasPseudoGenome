@@ -1,6 +1,15 @@
-151 reference nematode genome assemblies were taken from NCBI genbank. Only included sequences at the scaffold level or above from the 2010 or newer.
+159 (151 genbank, 8 refseq, these are duplicates, will need to remove) reference nematode genome assemblies were taken from NCBI genbank. Only included sequences at the scaffold level or above from the 2010 or newer.
 
+# copy fna files from downloaded species folders and put in single flder for busco 
 find ./* -type f -exec cp -n {} . \;
+
+# To parralellize this and save time, I split the 159 genomes into 10 (15-16 genomes per folder) separate folders, then looped busco on each of them
+
+for f1 in *.fna
+do
+busco -c 24 -i $f1 -l nematoda_odb10 --augustus -o ${f1%%.fna}"" -m geno
+done
+
 
 # parallelise modelfinder for IQTREE
 # 
