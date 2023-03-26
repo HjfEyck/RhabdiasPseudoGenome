@@ -1,0 +1,15 @@
+conda activte sspace_env
+conda install -c bioconda pilon # add pilon v1.24 to the environment
+
+PREFIX=Step7Pilon
+GENOME=Step_6_Blob_Dip_HYPO_scaffolds_tgsGapcloser.fasta
+BAM=PilonMapping_sorted.bam
+
+module load java/8u292-b10-openjdk
+
+PPN=30
+export _JAVA_OPTIONS=-Xmx500g
+pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid --verbose --changes --threads $PPN --fix indels 2>&1 | tee ${PREFIX}.log.tx
+
+
+JAR=/apps/pilon/1.24/pilon-1.24.jar
