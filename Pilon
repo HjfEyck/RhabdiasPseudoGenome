@@ -11,5 +11,10 @@ PPN=30
 export _JAVA_OPTIONS=-Xmx500g
 pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid --verbose --changes --threads $PPN --fix indels 2>&1 | tee ${PREFIX}.log.tx
 
+# OR with HYPO
 
-JAR=/apps/pilon/1.24/pilon-1.24.jar
+
+
+
+
+
