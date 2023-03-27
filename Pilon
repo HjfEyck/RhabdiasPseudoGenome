@@ -13,6 +13,11 @@ pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid -
 
 # OR with HYPO
 
+# Before hypo, long and short reads were mapped with minimap2 and samtools to the Step_6 genome, and samtools depth, in the same way as done for the first hypo run 
+#run hypo. This was run on High compute node
+hypo -t 30 -r @il_names.txt -d ../Step_6_Blob_Dip_HYPO_scaffolds_tgsGapcloser.fasta -b HypoMapping_SR_sorted.bam -c 60.3816 -s 253m -B Hypo_round2_LR_sorted.bam -p 96 \
+-o Step_7_Blob_Dip_hypo_scaffold_tgsGapCloser_hypo2.fasta
+
 
 
 
