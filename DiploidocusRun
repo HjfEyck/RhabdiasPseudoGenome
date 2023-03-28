@@ -1,0 +1,73 @@
+
+#also loaded r from conda
+conda install mamba -n base -c conda-forge
+mamba create -n purge_haplotigs -c conda-forge -c bioconda purge_haplotigs
+mamba install -c conda-forge -c bioconda kat minimap2 tidk
+conda activate purge_haplotigs
+conda install -c conda-forge r-base
+
+module add python/3.10.8 perl/5.36.0 bedtools2/2.30.0 mpfr/4.1.0 samtools/1.15.1 java/8u292-b10-openjdk bbmap/38.63 blast-plus/2.12.0
+# also had to install the r packages independently with conda using conda install -c conda-forge r-packagename
+
+# you have to go into R and load all these individually before you begin, otherwise it will not work
+R
+library(parallel)
+library(RColorBrewer)
+library(ggstatsplot)
+library(tidyverse)
+library(RColorBrewer)
+library(writexl)
+
+# doing it on raw blobcleaned data
+TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
+GENOME=DipFirst_hypo.fa
+BUSCO=full_table.tsv
+READS=rhabont_allreads_5000.fastq
+SCREENDB=vecscreendb.fasta
+PPN=24
+PREFIX=RAWDip
+
+samtools view -@ 24 -S -b HypoSR.sam > HypoSR.bam
+samtools sort -@ 24 HypoSR.bam -o HypoSR_sorted.bam
+
+python2 $TOOLS/diploidocus.py \
+-seqin $GENOME \
+-basefile $PREFIX \
+-busco full_table.tsv \
+-reads il_names.txt \
+-kmerreads il_names.txt \
+-bam DipRaw_SR_sorted.bam \
+-forks $PPN \
+-screendb $SCREENDB \
+-runmode diploidocus \
+-pretrim T \
+-veccheck T \
+-minlen 1000 \
+i=-1 v=1
+
+############################# Step 8, Final tidy ##################################################
+
+TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
+GENOME=Step_7_3_Blob_Dip_hypo_scaffold_tgsGapCloser_hypo2_Pilon_long.fasta
+BUSCO=full_table.tsv
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+SCREENDB=vecscreendb.fasta
+PPN=30
+PREFIX=FinalTidy
+
+python2 $TOOLS/diploidocus.py \
+-seqin $GENOME \
+-basefile $PREFIX \
+-busco full_table.tsv \
+-reads $READS \
+-kmerreads il_names_30.txt \
+-forks $PPN \
+-screendb $SCREENDB \
+-runmode dipcycle \
+-pretrim T \
+-veccheck T \
+-minlen 1000 \
+i=-1 v=1
+
+
+
