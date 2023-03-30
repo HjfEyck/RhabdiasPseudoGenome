@@ -25,12 +25,7 @@ conda install -c conda-forge r-base r-minpack.lm r-argparse
 
 
 ################ Genome size estimation with Depthsizer and Depthkopy ################
-mamba create -n depthsizer_env
-
-conda activate depthsizer_env
-mamba install -c conda-forge -c bioconda kat minimap2 tidk
-conda install -c conda-forge r-base
-conda install -c conda-forge r-parallel r-RColorBrewer r-ggstatsplot r-tidyverse r-writexl
+conda activate purge_haplotigs # purge_haplotigs has the necessary dependencies because it was made for diploidocus
 R # these must be independently loaded each time
 library(parallel)
 library(RColorBrewer)
@@ -38,10 +33,11 @@ library(ggstatsplot)
 library(tidyverse)
 library(writexl)
 #exit R
+# set up the files
 DEP=/srv/scratch/z5228384/tools/depthsizer/code
 module load jellyfish/1.1.11 samtools python
-
 READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+# Run depthsizer
 python2 $DEP/depthsizer.py basefile=DepthSizer_Step_8 summarise=T busco=full_table.tsv reads=$READS seqin=Step_8_FinalTidy.diploidocus.fasta forks=24
 
 
