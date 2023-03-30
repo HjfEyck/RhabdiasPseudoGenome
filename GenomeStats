@@ -1,14 +1,33 @@
 
 ################ assessing quality of intitial assembly using meryl and merqury ################
+# Using meryl and merqury to determine how well the initial assembly represents the raw illumina reads 
 # some of this analysis can also be done in kmer analysis toolkit
 # create an environment to install meryl and merqury into
 conda create --name merqury_env
 conda activate merqury_env
-conda install -c bioconda meryl merqury
-module load gcc/12.2.0 r bedtools2/2.30.0 samtools java/8u292-b10-openjdk igv
+# get meryl and merqury from github
+cd /srv/scratch/z5228384/tools
+wget https://github.com/marbl/meryl/releases/download/v1.4/meryl-1.4.Linux-amd64.tar.xz
+tar -xJf meryl-1.4.Linux-amd64.tar.xz
+MERYL=/srv/scratch/z5228384/tools/meryl-1.4/bin
+MERQURY=/srv/scratch/z5228384/tools/merqury
+Install other dependencies
+module load gcc/12.2.0 bedtools2/2.30.0 samtools java/8u292-b10-openjdk igv
+conda install -c conda-forge r-base r-minpack.lm r-argparse r-ggplot2 r-scales
+
+best_k.sh 
+# find best kmer length to use
+$MERQURY/best_k.sh -c 253300479
+# 23.9
+# Lets run meryl on the raw reads with that kmer length rounded to 24
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+$MERYL/meryl k=24 count output F.meryl $READS/Rhab_forward.fastq.gz memory=100 threads=24
+$MERYL/meryl k=24 count output R.meryl $READS/Rhab_reverse.fastq.gz memory=100 threads=24
 
 
-
+MERYLPARTS="*.meryl"
+MERYLDB=rhab.meryl
+$MERYL/meryl union-sum k=5 output rhab.meryl *.meryl memory=100 threads=24
 
 
 ################ Genome size estimation with Genomescope2 ################
@@ -21,6 +40,9 @@ conda install -c bioconda kmc
 # Genomescope requires R and some r packages
 # best to just conda install R, because dont trust R on katana
 conda install -c conda-forge r-base r-minpack.lm r-argparse
+
+
+
 
 
 
@@ -41,10 +63,10 @@ READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000
 python2 $DEP/depthsizer.py basefile=DepthSizer_Step_8 summarise=T busco=full_table.tsv reads=$READS seqin=Step_8_FinalTidy.diploidocus.fasta forks=24
 
 # results
-SeqFile	DepMethod	  Adjust	    ReadBP	      MapAdjust	         SCDepth	    EstGenomeSize
-Step_8	mpileup	    None	      27638051169	    1.0               110.24	      250707329
-Step_8	mpileup	    CovBases	  27638051169	    0.968092859963	  110.24	      242707975
-Step_8	mpileup	    IndelRatio	27638051169	    0.989762554634	  110.24	      253300479
+# SeqFile	  DepMethod	   Adjust	        ReadBP	      MapAdjust	        SCDepth	    EstGenomeSize
+# Step_8	    mpileup	    None	      27638051169	    1.0               110.24	      250707329
+# Step_8	    mpileup	    CovBases	  27638051169	    0.968092859963	  110.24	      242707975
+# Step_8	    mpileup	    IndelRatio	27638051169	    0.989762554634	  110.24	      253300479
 
 # Genome size is likely between 243mbp and 253mbp
 
