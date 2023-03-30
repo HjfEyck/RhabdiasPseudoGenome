@@ -18,7 +18,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(writexl)
 
-# doing it on raw blobcleaned data
+# Running diploidocus on raw blobcleaned data
 TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 GENOME=DipFirst_hypo.fa
 BUSCO=full_table.tsv
@@ -34,18 +34,21 @@ python2 $TOOLS/diploidocus.py \
 -seqin $GENOME \
 -basefile $PREFIX \
 -busco full_table.tsv \
--reads il_names.txt \
+-reads $READS \
 -kmerreads il_names.txt \
 -bam DipRaw_SR_sorted.bam \
 -forks $PPN \
 -screendb $SCREENDB \
--runmode diploidocus \
+-runmode dipcycle \
 -pretrim T \
 -veccheck T \
 -minlen 1000 \
 i=-1 v=1
 
 ############################# Step 8, Final tidy ##################################################
+
+# Diploidocus was run a second time at the final stage of assembly
+
 
 TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 GENOME=Step_7_3_Blob_Dip_hypo_scaffold_tgsGapCloser_hypo2_Pilon_long.fasta
