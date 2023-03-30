@@ -1,0 +1,38 @@
+
+################ assessing quality of intitial assembly using meryl and merqury ################
+# some of this analysis can also be done in kmer analysis toolkit
+# create an environment to install meryl and merqury into
+conda create --name merqury_env
+conda activate merqury_env
+conda install -c bioconda meryl merqury
+module load gcc/12.2.0 r bedtools2/2.30.0 samtools java/8u292-b10-openjdk igv
+
+
+
+
+
+################ Genome size estimation with Genomescope2 ################
+# create conda environment for genomescope
+conda create --name genomescope_env
+conda activate genomescope_env
+conda install -c bioconda genomescope2 kmc
+conda install -c bioconda kmc
+# Genomescope2 https://github.com/tbenavi1/genomescope2.0
+# Genomescope requires R and some r packages
+# best to just conda install R, because dont trust R on katana
+conda install -c conda-forge r-base r-minpack.lm r-argparse
+
+
+
+################ Genome size estimation with Depthsizer and Depthkopy ################
+
+conda create --name depthsizer_env
+conda activate depthsizer_env
+conda install -c bioconda kat minimap2 # katana does not have latest version of KAT or minimap2
+
+DEP=/srv/scratch/z5228384/tools/depthsizer/code
+module load jellyfish/1.1.11 samtools python
+
+
+
+################ completness statistics with BUSCOMP ################
