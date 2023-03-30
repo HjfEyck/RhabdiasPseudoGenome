@@ -24,7 +24,7 @@ conda install -c conda-forge r-base r-minpack.lm r-argparse
 
 
 
-################ Genome size estimation with Depthsizer and Depthkopy ################
+################ Genome size estimation with Depthsizer ################
 conda activate purge_haplotigs # purge_haplotigs has the necessary dependencies because it was made for diploidocus
 R # these must be independently loaded each time
 library(parallel)
@@ -40,6 +40,12 @@ READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000
 # Run depthsizer
 python2 $DEP/depthsizer.py basefile=DepthSizer_Step_8 summarise=T busco=full_table.tsv reads=$READS seqin=Step_8_FinalTidy.diploidocus.fasta forks=24
 
+# results
+SeqFile	DepMethod	  Adjust	    ReadBP	      MapAdjust	         SCDepth	    EstGenomeSize
+Step_8	mpileup	    None	      27638051169	    1.0               110.24	      250707329
+Step_8	mpileup	    CovBases	  27638051169	    0.968092859963	  110.24	      242707975
+Step_8	mpileup	    IndelRatio	27638051169	    0.989762554634	  110.24	      253300479
 
+# Genome size is likely between 243mbp and 253mbp
 
 ################ completness statistics with BUSCOMP ################
