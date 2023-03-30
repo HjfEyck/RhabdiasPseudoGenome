@@ -30,7 +30,7 @@ mamba create -n depthsizer_env
 conda activate depthsizer_env
 mamba install -c conda-forge -c bioconda kat minimap2 tidk
 conda install -c conda-forge r-base
-
+conda install -c conda-forge r-
 
 
 DEP=/srv/scratch/z5228384/tools/depthsizer/code
