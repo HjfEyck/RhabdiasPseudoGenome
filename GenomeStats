@@ -25,10 +25,13 @@ conda install -c conda-forge r-base r-minpack.lm r-argparse
 
 
 ################ Genome size estimation with Depthsizer and Depthkopy ################
+mamba create -n depthsizer_env
 
-conda create --name depthsizer_env
 conda activate depthsizer_env
-conda install -c bioconda kat minimap2 # katana does not have latest version of KAT or minimap2
+mamba install -c conda-forge -c bioconda kat minimap2 tidk
+conda install -c conda-forge r-base
+
+
 
 DEP=/srv/scratch/z5228384/tools/depthsizer/code
 module load jellyfish/1.1.11 samtools python
