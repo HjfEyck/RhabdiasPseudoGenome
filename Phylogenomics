@@ -9,7 +9,7 @@ for f1 in *.fna
 do
 busco -c 24 -i $f1 -l nematoda_odb10 --augustus -o ${f1%%.fna}"" -m geno
 done
-
+# takes a very long time to run busco on 151 genomes
 
 # parallelise modelfinder for IQTREE
 # 
