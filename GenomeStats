@@ -1,7 +1,7 @@
 
 ################ Kmer Analysis Toolkit to assess assembly quality based on raw reads ################
 # Generate kat comp spectra plot with the raw reads compared to the assembly
-
+kat comp -t 24 -o pe_v_asm_test '/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedF.fastq.gz /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedR.fastq.gz' Step_1_assembly.fasta -p pdf
 
 
 
