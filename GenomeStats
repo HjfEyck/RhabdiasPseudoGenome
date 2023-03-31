@@ -1,47 +1,14 @@
 
-################ assessing quality of intitial assembly using meryl and merqury ################
-# Using meryl and merqury to determine how well the initial assembly represents the raw illumina reads 
-# some of this analysis can also be done in kmer analysis toolkit
-# create an environment to install meryl and merqury into
-conda create --name merqury_env
-conda activate merqury_env
-# get meryl and merqury from github
-cd /srv/scratch/z5228384/tools
-wget https://github.com/marbl/meryl/releases/download/v1.4/meryl-1.4.Linux-amd64.tar.xz
-tar -xJf meryl-1.4.Linux-amd64.tar.xz
-MERYL=/srv/scratch/z5228384/tools/meryl-1.4/bin
-MERQURY=/srv/scratch/z5228384/tools/merqury
-Install other dependencies
-module load gcc/12.2.0 bedtools2/2.30.0 samtools java/8u292-b10-openjdk igv
-conda install -c conda-forge r-base r-minpack.lm r-argparse r-ggplot2 r-scales
+################ Kmer Analysis Toolkit to assess assembly quality based on raw reads ################
+# Generate kat comp spectra plot with the raw reads compared to the assembly
 
-best_k.sh 
-# find best kmer length to use
-$MERQURY/best_k.sh -c 253300479
-# 23.9
 
-# Lets run meryl on the raw reads with that kmer length rounded to 24
-# Reads are paired end, so must first do each pair individually
-READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads
-$MERYL/meryl k=24 count output F.meryl $READS/RhabdiasCleanPairedF.fastq.gz memory=100 threads=24
-$MERYL/meryl k=24 count output R.meryl $READS/RhabdiasCleanPairedR.fastq.gz memory=100 threads=24
 
-# Now we merge the individual databases
-MERYLPARTS="*.meryl"
-MERYLDB=rhab.meryl
-$MERYL/meryl union-sum output rhab.meryl *.meryl threads=24
 
-#have to go into r before this next step and load the three required packages 
-R
-library(argparse)
-library(ggplot2)
-library(scales)
-# exit R
-sh $MERQURY/trio/hapmers.sh F.meryl R.meryl rhab.meryl
 
-# Now run merqury on that merged database
-$MERQURY/merqury.sh rhab.meryl Step_1_ RhabGen
-
+KAT=/srv/scratch/z5228384/tools/KAT-Release-2.4.1/scripts/kat
+$KAT/distanalysis.py 
+python $KAT/distanalysis.py pe_v_asm_test-main.mx
 
 ################ Genome size estimation with Genomescope2 ################
 # create conda environment for genomescope
@@ -82,5 +49,25 @@ python2 $DEP/depthsizer.py basefile=DepthSizer_Step_8 summarise=T busco=full_tab
 # Step_8	    mpileup	    IndelRatio	27638051169	    0.989762554634	  110.24	      253300479
 
 # Genome size is likely between 243mbp and 253mbp
+
+################ Copy number variation with DepthKopy ################
+conda activate purge_haplotigs # purge_haplotigs has the necessary dependencies because it was made for diploidocus
+R # these must be independently loaded each time
+library(parallel)
+library(RColorBrewer)
+library(ggstatsplot)
+library(tidyverse)
+library(writexl)
+#exit R
+
+DEP=/srv/scratch/z5228384/tools/depthkopy/code
+module load jellyfish/1.1.11 samtools python
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+# Run depthsizer
+python2 $DEP/depthkopy.py basefile=DepthKopy_Step_8 summarise=T busco=full_table.tsv reads=$READS seqin=Step_8_FinalTidy.diploidocus.fasta forks=30
+
+
+
+
 
 ################ completness statistics with BUSCOMP ################
