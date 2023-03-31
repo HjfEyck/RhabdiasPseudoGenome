@@ -1,0 +1,10 @@
+
+
+
+#Create a Database for RepeatModeler
+BuildDatabase -name RhabReps -engine ncbi -dir Step_8
+
+#Run RepeatModeler
+nohup RepeatModeler -database RhabReps -threads 24 -LTRStruct >& run.out &
+
+RepeatModeler -database rmod_numt -pa 30 > rmod_numt.out
