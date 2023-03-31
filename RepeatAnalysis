@@ -2,9 +2,9 @@
 
 
 #Create a Database for RepeatModeler
-BuildDatabase -name RhabReps -engine ncbi -dir Step_8
+BuildDatabase -name RhabReps -engine ncbi Step_8_FinalTidy.diploidocus.fasta
 
 #Run RepeatModeler
-nohup RepeatModeler -database RhabReps -threads 24 -LTRStruct >& run.out &
+RepeatModeler -database RhabReps -pa 24 -LTRStruct > RhabReps.out
 
-RepeatModeler -database rmod_numt -pa 30 > rmod_numt.out
+
