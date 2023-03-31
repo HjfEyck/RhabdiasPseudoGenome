@@ -20,14 +20,14 @@ best_k.sh
 $MERQURY/best_k.sh -c 253300479
 # 23.9
 # Lets run meryl on the raw reads with that kmer length rounded to 24
-READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-$MERYL/meryl k=24 count output F.meryl $READS/Rhab_forward.fastq.gz memory=100 threads=24
-$MERYL/meryl k=24 count output R.meryl $READS/Rhab_reverse.fastq.gz memory=100 threads=24
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads
+$MERYL/meryl k=24 count output F.meryl $READS/RhabdiasCleanPairedF.fastq.gz memory=100 threads=24
+$MERYL/meryl k=24 count output R.meryl $READS/RhabdiasCleanPairedR.fastq.gz memory=100 threads=24
 
 
 MERYLPARTS="*.meryl"
 MERYLDB=rhab.meryl
-$MERYL/meryl union-sum k=5 output rhab.meryl *.meryl memory=100 threads=24
+$MERYL/meryl union-sum output rhab.meryl *.meryl threads=24
 
 
 ################ Genome size estimation with Genomescope2 ################
