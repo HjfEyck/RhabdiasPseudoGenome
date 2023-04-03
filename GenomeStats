@@ -71,8 +71,14 @@ READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000
 # Run depthsizer
 python2 $DEP/depthkopy.py basefile=DepthKopy_Step_8 summarise=T busco=full_table.tsv reads=$READS seqin=Step_8_FinalTidy.diploidocus.fasta forks=30
 
-
-
-
-
 ################ completness statistics with BUSCOMP ################
+
+SLIM=/srv/scratch/z5228384/tools/SLiMSuite/tools
+conda activate purge_haplotigs
+module load python
+#fasta files and busco files have both be in their own seperate directories (e,g, buscos for busco files, and fastas for fasta files) and named identical to their partners
+python2 $SLIM/buscomp.py runs=./buscos/*Step* fastadir=./fastas forks=8
+
+
+
+
