@@ -12,7 +12,9 @@ TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
 cd /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
 # remove adapters, but do not quality trim
 java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2.fastq.gz mtDNA_Raw_Paired_F.fastq.gz mtDNA_Raw_Unpaired_F.fastq.gz mtDNA_Raw_Paired_R.fastq.gz mtDNA_Raw_UnpairedR.fastq.gz ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
-
+# reads then must be gunzipped
+gunzip *Paired*
+# Now we can use them to assemble a mitogenome
 # Create Novoplasty environment and install
 conda create --name mtDNA_env
 conda activate mtDNA_env
@@ -21,8 +23,8 @@ conda install -c bioconda novoplasty
 # config file was run as follows
 # note that I am using the complete Celegans mitochondrial genome as a seed
 # seeds are optional, but because there is still the chance that some toad reads could be present despite decontamination, I played it safe and used a nematode seed
-# This hopefully will work, because (chromodorean) nematode mitogenomes are often quite distinct from most other animals in that they have all the coding genes on a single strand.
-# No reference sequence was added because novoplasty only recommends to use a species from within genus, and no such mitogenomes exist currently
+# This hopefully will work, because (chromodorean) nematode mitogenomes are often quite distinct from most other animals in that they have all the coding genes on a single strand of the mitogenome.
+# No reference sequence was added because novoplasty only recommends to use a species from within genus, and no such mitogenomes are available currently
 Project:
 -----------------------
 Project name          = RhabmtDNA
@@ -45,8 +47,8 @@ Insert size           = 300
 Platform              = illumina
 Single/Paired         = PE
 Combined reads        = 
-Forward reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedF.fastq.gz
-Reverse reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedR.fastq.gz
+Forward reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/Rhab_forward.fastq.gz
+Reverse reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/Rhab_reverse.fastq.gz
 Store Hash            =
 
 Heteroplasmy:
