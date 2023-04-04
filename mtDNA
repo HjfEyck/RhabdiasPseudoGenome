@@ -19,7 +19,6 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -t 24 \
 -1 $IL/mtDNA_Raw_Paired_F.fastq \
 -2 $IL/mtDNA_Raw_Paired_R.fastq \
--u $ONT \
 -s $MT \
 -F animal_mt \
--o GOmtDNA
+-o mtDNA2
