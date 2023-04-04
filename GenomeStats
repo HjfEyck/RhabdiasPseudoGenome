@@ -1,11 +1,22 @@
+################ meryl and merqury to assess assembly quality ################
+
+best_k.sh 253300479 # genome size is largest estimate from depthsizer 
+# result = kmer=18.9674
+# Round up to 19
+
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+meryl k=19 count output F.meryl $READS/ToadRem_1.fastq.gz memory=200 threads=24
+meryl k=19 count output R.meryl $READS/ToadRem_2.fastq.gz memory=200 threads=24
+# comine forward ad reverse 
+meryl union-sum output rhab.meryl *.meryl memory=200 threads=24
+# run merqury
+$MERQURY/merqury.sh rhab.meryl Step8_hypoGapfilled_5000.fa.diploidocus.fasta step8
+MERYLDB=rhab.meryl
+$MERQURY/eval/spectra-cn.sh $(basename $MERYLDB) $ASSEMBLY $PREFIX
 
 ################ Kmer Analysis Toolkit to assess assembly quality based on raw reads ################
 # Generate kat comp spectra plot with the raw reads compared to the assembly
-kat comp -t 24 -o pe_v_asm_test '/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedF.fastq.gz /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedR.fastq.gz' Step_1_assembly.fasta -p pdf
-
-
-
-
+kat comp -t 19 -o pe_v_asm_test '/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedF.fastq.gz /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedR.fastq.gz' Step_1_assembly.fasta -p pdf
 KAT=/srv/scratch/z5228384/tools/KAT-Release-2.4.1/scripts/kat
 $KAT/distanalysis.py 
 python $KAT/distanalysis.py pe_v_asm_test-main.mx
@@ -22,12 +33,12 @@ conda install -c bioconda kmc
 conda install -c conda-forge r-base r-minpack.lm r-argparse
 mkdir tmp
 # we have the illumina read paths saved to a file called il_names_30.txt
-# 24 was picked as kmer length based on best_k.sh script run on the estimated genome length of 253mbp
-kmc -k24 -t8 -m32 -ci1 -cs10000 @il_names_30.txt reads tmp/
-kmc_tools -t8 transform reads histogram reads.histo -cx10000
-genomescope2 -i reads.histo -o genscopeOUT -k 24
+# 19 was picked as kmer length based on best_k.sh script run on the estimated genome length of 253mbp
+kmc -k19 -t24 -m200 -ci1 -cs10000 @il_names_30.txt reads tmp/
+kmc_tools -t24 transform reads histogram reads.histo -cx10000
+genomescope2 -i reads.histo -o genscopeOUT -k 19
 # output
-###GenomeScope analyzing reads.histo p=2 k=24 outdir=genscopeOUT
+###GenomeScope analyzing reads.histo p=2 k=19 outdir=genscopeOUT
 ###aa:99.8% ab:0.163%
 ##Model converged het:0.00163 kcov:21.8 err:0.000343 model fit:1.78 len:250617132
 
