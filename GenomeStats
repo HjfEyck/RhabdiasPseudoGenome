@@ -5,14 +5,21 @@ best_k.sh 253300479 # genome size is largest estimate from depthsizer
 # Round up to 19
 
 READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-meryl k=19 count output F.meryl $READS/ToadRem_1.fastq.gz memory=200 threads=24
-meryl k=19 count output R.meryl $READS/ToadRem_2.fastq.gz memory=200 threads=24
+export PATH=/srv/scratch/z5228384/tools/meryl-1.4/bin:$PATH
+meryl k=19 count output F.meryl $READS/Rhab_forward.fastq.gz memory=200 threads=24
+meryl k=19 count output R.meryl $READS/Rhab_reverse.fastq.gz memory=200 threads=24
 # comine forward ad reverse 
 meryl union-sum output rhab.meryl *.meryl memory=200 threads=24
 # run merqury
-$MERQURY/merqury.sh rhab.meryl Step8_hypoGapfilled_5000.fa.diploidocus.fasta step8
+$MERQURY/merqury.sh rhab.meryl $GENOME step8
 MERYLDB=rhab.meryl
+ASSEMBLY=Step_8_FinalTidy.diploidocus.fasta
+PREFIX=FUKU
 $MERQURY/eval/spectra-cn.sh $(basename $MERYLDB) $ASSEMBLY $PREFIX
+
+$MERQURY/eval/spectra-cn.sh $(basename $MERYLDB) $ASSEMBLY $PREFIX
+mv completeness.stats $PREFIX.completeness.stats
+cat $PREFIX.completeness.stats $PREFIX.q
 
 ################ Kmer Analysis Toolkit to assess assembly quality based on raw reads ################
 # Generate kat comp spectra plot with the raw reads compared to the assembly
