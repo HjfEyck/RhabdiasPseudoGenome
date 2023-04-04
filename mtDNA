@@ -1,0 +1,60 @@
+
+
+
+
+First had to create new raw reads that were NOT quality trimmed, but did have adapters removed
+
+
+conda create --name mtDNA_env
+conda activate mtDNA_env
+conda install -c bioconda novoplasty
+
+
+
+
+
+# run novoplasty
+# config file was run as follows
+
+Project:
+-----------------------
+Project name          = RhabmtDNA
+Type                  = mito
+Genome Range          = 12000-22000
+K-mer                 = 33
+Max memory            = 220
+Extended log          = 0
+Save assembled reads  = yes
+Seed Input            = /path/to/seed_file/Seed.fasta
+Extend seed directly  = no
+Reference sequence    = /path/to/reference_file/reference.fasta (optional)
+Variance detection    = 
+Chloroplast sequence  =
+
+Dataset 1:
+-----------------------
+Read Length           = 151
+Insert size           = 300
+Platform              = illumina
+Single/Paired         = PE
+Combined reads        = 
+Forward reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedF.fastq.gz
+Reverse reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/TrimmedReads/RhabdiasCleanPairedR.fastq.gz
+Store Hash            =
+
+Heteroplasmy:
+-----------------------
+MAF                   = 
+HP exclude list       = 
+PCR-free              = yes
+
+Optional:
+-----------------------
+Insert size auto      = yes
+Use Quality Scores    = no
+Output path           = /srv/scratch/z5228384/RhabGenomePaper/mtDNA
+
+
+
+
+NOVOPlasty4.3.1.pl
