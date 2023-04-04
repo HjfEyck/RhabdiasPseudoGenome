@@ -1,66 +1,22 @@
 # Assembling the mtDNA for Rhabdias pseudosphaerocephala
-# Using novoplasty to do this
-# assembling them from raw read data
-# First had to create new raw reads that were NOT quality trimmed, but did have adapters removed.
-# This is because novoplasty requires non-quality-trimmed reads according to their github instructions
-# I did however use the reads that had toad data removed, for obvious reasons to avoid contamination
-# create environment
-module purge
-module load java/8u292-b10-openjdk
-TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
-#Navigate to working directory
-cd /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-# remove adapters, but do not quality trim
-java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2.fastq.gz mtDNA_Raw_Paired_F.fastq.gz mtDNA_Raw_Unpaired_F.fastq.gz mtDNA_Raw_Paired_R.fastq.gz mtDNA_Raw_UnpairedR.fastq.gz ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
-# reads then must be gunzipped
-gunzip *Paired*
-# Now we can use them to assemble a mitogenome
-# Create Novoplasty environment and install
-conda create --name mtDNA_env
-conda activate mtDNA_env
-conda install -c bioconda novoplasty
-# run novoplasty
-# config file was run as follows
-# note that I am using the complete Celegans mitochondrial genome as a seed
-# seeds are optional, but because there is still the chance that some toad reads could be present despite decontamination, I played it safe and used a nematode seed
-# This hopefully will work, because (chromodorean) nematode mitogenomes are often quite distinct from most other animals in that they have all the coding genes on a single strand of the mitogenome.
-# No reference sequence was added because novoplasty only recommends to use a species from within genus, and no such mitogenomes are available currently
-Project:
------------------------
-Project name          = RhabmtDNA
-Type                  = mito
-Genome Range          = 12000-22000
-K-mer                 = 33
-Max memory            = 220
-Extended log          = 0
-Save assembled reads  = yes
-Seed Input            = /srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
-Extend seed directly  = no
-Reference sequence    =
-Variance detection    = 
-Chloroplast sequence  =
 
-Dataset 1:
------------------------
-Read Length           = 151
-Insert size           = 300
-Platform              = illumina
-Single/Paired         = PE
-Combined reads        = 
-Forward reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/Rhab_forward.fastq.gz
-Reverse reads         = /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/Rhab_reverse.fastq.gz
-Store Hash            =
+# First I wanted to use raw data that had toad reads removed and no adapters, but had NOT been quality controlled
+# mtDNA assemblers seem (from my reading) to usually use truly raw reads, but I did not want to have toad reads in my data, nor adapters
+# Chromodorean nematode should have all genes on the same strand of the mitogenome, and this is not true of toads
+# so it will probably be easy to spot a wrongly assembled gene  
+# To trim the new dataset i used trimmomatic
 
-Heteroplasmy:
------------------------
-MAF                   = 
-HP exclude list       = 
-PCR-free              = yes
 
-Optional:
------------------------
-Insert size auto      = yes
-Use Quality Scores    = no
-Output path           = /srv/scratch/z5228384/RhabGenomePaper/mtDNA
-
-NOVOPlasty4.3.1.pl
+module load perl python spades bowtie2 blast-plus
+cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
+MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
+IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/mtDNA_READS
+ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
+-t 24 \
+-1 $IL/mtDNA_Raw_Paired_F.fastq \
+-2 $IL/mtDNA_Raw_Paired_R.fastq \
+-u $ONT \
+-s $MT \
+-F animal_mt \
+-o GOmtDNA
