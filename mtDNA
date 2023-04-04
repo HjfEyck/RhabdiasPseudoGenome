@@ -5,8 +5,11 @@
 # Chromodorean nematode should have all genes on the same strand of the mitogenome, and this is not true of toads
 # so it will probably be easy to spot a wrongly assembled gene  
 # To trim the new dataset i used trimmomatic
+module load java/8u292-b10-openjdk
+TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
+java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq ToadRem_2.fastq mtDNA_Paired_F.fastq mtDNA_Unpaired_F.fastq mtDNA_Paired_R.fastq mtDNA_Unpaired_R.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
 
-
+# Now we can use these to generate the mitogenome
 module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
