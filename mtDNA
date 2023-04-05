@@ -7,7 +7,7 @@
 # To trim the new dataset i used trimmomatic
 module load java/8u292-b10-openjdk
 TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
-java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq ToadRem_2.fastq mtDNA_Paired_F.fastq mtDNA_Unpaired_F.fastq mtDNA_Paired_R.fastq mtDNA_Unpaired_R.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
+java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2.fastq.gz mtDNA_toadrem_Paired_F.fastq mtDNA_toadrem_Unpaired_F.fastq mtDNA_toadrem_Paired_R.fastq mtDNA_toadrem_Unpaired_R.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
 
 # Now we can use these to generate the mitogenome
 module load perl python spades bowtie2 blast-plus
@@ -22,3 +22,22 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -s $MT \
 -F animal_mt \
 -o mtDNA2
+
+
+
+# Now we can use these to generate the mitogenome
+module load perl python spades bowtie2 blast-plus
+cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
+MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
+IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
+-t 24 \
+-1 $IL/mtDNA_toadrem_Paired_F.fastq \
+-2 $IL/mtDNA_toadrem_Paired_R.fastq \
+-s $MT \
+-w 95 \
+-k 21,33,45,55,61,71,75,81,85,91,95,101,105,111,105,121,125 \
+-F animal_mt \
+-R 30 \
+-o mtDNA_no_Trimmed_toadintact_R30_kmerExtended
