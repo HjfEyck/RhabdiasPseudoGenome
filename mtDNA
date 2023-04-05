@@ -9,12 +9,11 @@ module load java/8u292-b10-openjdk
 TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
 java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2.fastq.gz mtDNA_toadrem_Paired_F.fastq mtDNA_toadrem_Unpaired_F.fastq mtDNA_toadrem_Paired_R.fastq mtDNA_toadrem_Unpaired_R.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
 
-# Now we can use these to generate the mitogenome
+# Now we can use these to generate the mitogenome using the C. elegans mitogenome as a seed file
 module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/mtDNA_READS
-ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
 python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -t 24 \
 -1 $IL/mtDNA_Raw_Paired_F.fastq \
@@ -25,18 +24,41 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 
 
 
-# Now we can use these to generate the mitogenome
+# With some extra parameters
 module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
 python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -t 24 \
 -1 $IL/mtDNA_toadrem_Paired_F.fastq \
 -2 $IL/mtDNA_toadrem_Paired_R.fastq \
 -s $MT \
--w 95 \
+-w 105 \
 -F animal_mt \
--R 20 \
--o mtDNA_no_Trimmed_toadintact_R20_W95
+-o mtDNA_toadrem_W105
+
+
+# Now try without a seed
+module load perl python spades bowtie2 blast-plus
+cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
+IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
+-t 24 \
+-1 $IL/mtDNA_toadrem_Paired_F.fastq \
+-2 $IL/mtDNA_toadrem_Paired_R.fastq \
+-F animal_mt \
+-o mtDNA_noseed
+
+# Now try with P. pacificus mitogenome. It is similar level of differentiation from rhabdias as c. elegans
+module load perl python spades bowtie2 blast-plus
+cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
+MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/NC_015245.1_P_pacificus_mtDNA.fasta
+IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
+-t 24 \
+-1 $IL/mtDNA_toadrem_Paired_F.fastq \
+-2 $IL/mtDNA_toadrem_Paired_R.fastq \
+-s $MT \
+-F animal_mt \
+-o mtDNA_pacificus_ref
