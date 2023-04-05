@@ -37,7 +37,6 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -2 $IL/mtDNA_toadrem_Paired_R.fastq \
 -s $MT \
 -w 95 \
--k 21,45,65,85,105 \
 -F animal_mt \
 -R 20 \
 -o mtDNA_no_Trimmed_toadintact_R20_W95
