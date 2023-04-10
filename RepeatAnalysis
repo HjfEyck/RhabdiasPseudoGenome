@@ -4,7 +4,29 @@
 #Create a Database for RepeatModeler
 BuildDatabase -name RhabReps -engine ncbi Step_8_FinalTidy.diploidocus.fasta
 
-#Run RepeatModeler
-RepeatModeler -database RhabReps -pa 24 -LTRStruct > RhabReps.out
+# de-novo modelling of repeats
+RepeatModeler -database RhabReps -pa 24 > RhabReps.out
 
+# taking known nematoda repeats from repbase
+queryRepeatDatabase.pl -species nematoda > nemRepDatabase.fasta
+##
+# 16 ancestral and ubiquitous sequence(s) with a total length of 30426 bp
+# 0 nematoda specific repeats with a total length of 0 bp
+# 180 lineage specific sequence(s) with a total length of 346342 bp
 
+# I was unable to run the LTRstruct flag within repeatmodeler, so attempted to extract LTRs another way
+# using ltrretriever and ltrfinder (https://github.com/oushujun/LTR_retriever)
+# find ltrs in the genome
+gt suffixerator -db Step_8_FinalTidy.diploidocus.fasta -indexname Step_8_FinalTidy.diploidocus.fasta -tis -suf -lcp -des -ssp -sds -dna
+gt ltrharvest -index Step_8_FinalTidy.diploidocus.fasta -minlenltr 100 -maxlenltr 7000 -mintsd 4 -maxtsd 6 -motif TGCA -motifmis 1 -similar 85 -vic 10 -seed 20 -seqids yes > Step_8_FinalTidy.diploidocus.fasta.harvest.scn
+# had to simplify the names of the fasta sequences for the next step
+perl $LTR/LTR_FINDER_parallel -seq Step_8_FinalTidy.diploidocus.fasta -threads 16 -harvest_out
+cat Step_8_FinalTidy.diploidocus.fasta.harvest.scn Step_8_FinalTidy.diploidocus_simplenames.fasta.finder.combine.scn > Step_8_FinalTidy.fa.rawLTR.scn
+# Then retrieve the LTRs
+LTR_retriever -genome Step_8_FinalTidy.diploidocus.fasta -inharvest Step_8_FinalTidy.fa.rawLTR.scn -threads 16
+
+Combine all of the repeats into a single database
+cat *.fa > RepBase_LTR_repmodel.fa
+
+# Use repeatmasker using this database
+RepeatMasker -pa 16 -lib RepBase_LTR_repmodel.fa -dir RepeatDatabase Step_8_FinalTidy.diploidocus.fasta
