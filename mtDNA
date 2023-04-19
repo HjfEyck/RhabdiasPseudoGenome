@@ -63,4 +63,4 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -F animal_mt \
 -o mtDNA_pacificus_ref
 
-meangs.py -1 $IL/mtDNA_toadrem_Paired_F.fastq -2 $IL/mtDNA_toadrem_Paired_R.fastq -i 370 -o MEANGS1 -t 8 -i --deepin --clip --silence --species_class Nematoda 
+meangs.py -1 $IL/mtDNA_toadrem_Paired_F.fastq -2 $IL/mtDNA_toadrem_Paired_R.fastq -i 370 -o MEANGS1 -t 8 --deepin --clip --silence --species_class Nematoda 
