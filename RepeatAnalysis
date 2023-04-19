@@ -30,3 +30,29 @@ cat *.fa > RepBase_LTR_repmodel.fa
 
 # Use repeatmasker using this database
 RepeatMasker -pa 16 -lib RepBase_LTR_repmodel.fa -dir RepeatDatabase Step_8_FinalTidy.diploidocus.fasta
+
+grep "SINEs\|LINEs\|LTR\|DNA\|Unclassified\|Total\|Small\|Satellites\|Simple\|Low" Step_8_FinalTidy.diploidocus.fasta.tbl | sed 's/%\|://g' | sed 's/$/\tstep8/' > repeats_summary.txt
+
+sed 's/Total interspersed/Totalinterspersed/g' repeats_summary.txt | sed 's/LTR elements/LTRelements/g' | sed 's/DNA elements/DNAelements/g' | sed 's/Small RNA/SmallRNA/g' | sed 's/Simple repeats/Simplerepeats/g' | sed 's/Low complexity/Lowcomplexity/g' | sed 's/ \+ /\t/g' | sed 's/ /\t/g' > repeats_summary_format.txt
+
+grep -v "Totalinterspersed" repeats_summary_format.txt > repeats_nototal_summary_format.txt
+
+
+# In R
+library(ggplot2)
+library(dplyr)
+setwd("D:/bio/PostUNSW/repeats/")
+reps<- read.table("repeats_nototal_summary_format_2.txt", sep="\t")
+
+reps$V1 <- factor(reps$V1, levels=c("Unclassified", "SmallRNA",
+                                     "DNAelements","Lowcomplexity","Simplerepeats","Satellites", "LTRelements","LINEs", "SINEs"))
+reps$V7 <- factor(reps$V7)
+ggplot(reps, aes(fill=V1, y=V5, x=V7)) + geom_bar(position="stack", stat="identity") + coord_flip()+theme_classic() +
+    scale_fill_brewer(palette="Set3", labels = c("Unclassified","Small RNA", "DNA elements","Low complexity","Simple
+Repeats","Satellites", "LTR","LINEs", "SINEs"))+
+    xlab("")+ylab("Genome Content %")+
+    theme(axis.text.x = element_text(size = 26), axis.text.y = element_text(size = 26),axis.title.y = element_text(size = 20) )
++Projects/Katarina Stuart/KStuart.Starling-Aug18/Sv3_Genome/Assessment/2021.09.23.RR_RepeatAnalysis 5 of 8
+theme(legend.text = element_text(size=22)) + theme(axis.text.y = element_text(colour = "black"),axis.text.x =
+                                                       element_text(colour = "black"))+
+    theme(legend.position="bottom", legend.title=element_blank())+ guides(fill = guide_legend(reverse = TRUE))
