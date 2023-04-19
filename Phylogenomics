@@ -24,6 +24,18 @@ done
 # Also. some papers indicate maximising taxon sampling is the most important factor here.
 # Will assess how many busco scores top 80% and see if it is a devastating reduction in number of taxa in the dataset.
 
+for dir in /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/ncbi_dataset/data/FinishedBuscoFolders/*/; do
+    for file in "$dir"/*.txt; do
+        species=$(basename "$dir")
+        echo -n "$species $(grep 'C:' "$file" | awk '{print $1, $2}') " >> output.txt
+    done
+    echo "" >> output.txt
+done
+sed 's/^.*C:\([0-9.]*%\).*$/\1/' output.txt > BuscoScores.txt
+cut -f 1 output.txt > AssemblyNames.txt
+paste AssemblyNames.txt BuscoScores.txt > FinalBuscoScores.txt
+
+
 # I also wanted to decide on a dataset.
 
 
