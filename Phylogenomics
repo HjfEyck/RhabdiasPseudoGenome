@@ -9,11 +9,11 @@ for f1 in *.fna
 do
 busco -c 24 -i $f1 -l nematoda_odb10 --augustus -o ${f1%%.fna}"" -m geno
 done
-# takes a very long time to run busco on 151 genomes
+# takes a very long time to run busco on this many
 
 # Next needed an outgroup
 # Previously used out groups for neamtoda include kinorhyncha, priaplulida, tardigrada, nematomorpha
-# there are no nematomorpha, or kinorhyncha, or nematomorpha genomes available
+# there are no nematomorpha, kinorhyncha, or nematomorpha genomes available
 # there are 5 targigrade and 1 priapulida reference genomes available
 # Going to try them as an outgroup
 # They were downloaded and run against the nematoda_odb10 database, as above.
@@ -31,10 +31,55 @@ done
 sed 's/^.*C:\([0-9.]*%\).*$/\1/' output.txt > BuscoScores.txt
 cut -f 1 output.txt > AssemblyNames.txt
 paste AssemblyNames.txt BuscoScores.txt > FinalBuscoScores.txt
-# I then used excel to see which are less than 80%
+# I then used excel to see which are less than 80% and generated a list of them called LowBuscoScores.csv
 mkdir LowBuscos
 cut -d ',' -f 1 LowBuscoScores.csv | tr -d '\r' | xargs -I {} mv {} LowBuscos/ # this will move the low scoring busco folders to a folder called LowBuscoScores
-# I also wanted to decide on a dataset.
+
+# now that i had a cleaned dataset, next i needed to get all the single copy genes from every species, rename them accordingly, then put them all in a directory together for further analysis
+
+# Loop through original subdirectories
+for dir in */; do
+
+    # Change to single_copy_busco_sequences subdirectory
+    cd $dir/run_nematoda_odb10/busco_sequences/single_copy_busco_sequences
+
+    # Get abbreviation for directory name
+    abbrv=$(basename $dir)
+
+    # Make renamed directory
+    mkdir renamed
+
+    # Loop through .faa files in single_copy_busco_sequences directory
+    for file in *.faa; do
+
+        # Copy file to renamed directory with abbreviation in name
+        cp $file renamed/${abbrv}_${file}
+
+        # Replace > with >$abbrv| in copied file
+        sed -i "s/^>/>$abbrv|/" renamed/${abbrv}_${file}
+
+        # Convert sequence names to upper case and write to new file
+        cut -f 1 -d ":" renamed/${abbrv}_${file} | tr '[:lower:]' '[:upper:]' > renamed/${abbrv}_${file}.1
+
+        # Move new file to original file name
+        mv renamed/${abbrv}_${file}.1 renamed/${abbrv}_${file}
+
+    done
+
+    # Move everything to foldder for further analysis
+    mv renamed/* /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/SingleCopyAminoAcids
+
+    # Change back to original directory
+    cd ../../../../
+
+done
+
+
+
+
+
+
+
 
 
 # parallelise modelfinder for IQTREE
