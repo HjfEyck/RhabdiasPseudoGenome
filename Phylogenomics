@@ -20,10 +20,7 @@ done
 
 # My next task was to decide on a cutoff for busco quality. Some of the busco scores of the assemblies were low
 # This paper "A Practical Guide to Design and Assess a Phylogenomic Study" indicates a cutoff of 80% could be valid
-# real pain in the arse to filter over 150 busco folders tho
-# Also. some papers indicate maximising taxon sampling is the most important factor here.
-# Will assess how many busco scores top 80% and see if it is a devastating reduction in number of taxa in the dataset.
-
+# Here I checked and removed the buscos lower than 80% from the directory
 for dir in /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/ncbi_dataset/data/FinishedBuscoFolders/*/; do
     for file in "$dir"/*.txt; do
         species=$(basename "$dir")
@@ -34,8 +31,9 @@ done
 sed 's/^.*C:\([0-9.]*%\).*$/\1/' output.txt > BuscoScores.txt
 cut -f 1 output.txt > AssemblyNames.txt
 paste AssemblyNames.txt BuscoScores.txt > FinalBuscoScores.txt
-
-
+# I then used excel to see which are less than 80%
+mkdir LowBuscos
+cut -d ',' -f 1 LowBuscoScores.csv | tr -d '\r' | xargs -I {} mv {} LowBuscos/ # this will move the low scoring busco folders to a folder called LowBuscoScores
 # I also wanted to decide on a dataset.
 
 
