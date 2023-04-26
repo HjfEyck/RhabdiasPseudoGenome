@@ -31,7 +31,7 @@ module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-get_organelle_from_reads.py \
+python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -t 16 \
 -1 $IL/Rhab_forward.fastq.gz \
 -2 $IL/Rhab_reverse.fastq.gz \
