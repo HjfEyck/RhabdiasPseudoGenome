@@ -7,6 +7,9 @@ module load bedtools2/2.30.0
 $NUMT/numtfinder.py forks=8 seqin=Step_8_FinalTidy.diploidocus.fasta.masked mtdna= basefile=./numtMASKED
 bedtools maskfasta -fi Step_8_FinalTidy.diploidocus.fasta.masked -bed numtMASKED.numtsearch.unique.gff -fo Step_8_FinalTidy.diploidocus_repmasked_numtmasked.fasta 
 
+# Next step was to simplify the contigs names in the assembly, which is recommended by Braker2 https://github.com/Gaius-Augustus/BRAKER
+
+
 # Now that repeats and NUMTs are masked, we can annotate using GeMoMa and braker
 #First GeMoMa
 
@@ -37,3 +40,7 @@ s=own i=S_ratti2 a=$RFDIR/S_ratti.gff g=$RFDIR/S_ratti.fa \
 s=own i=L_loa a=$RFDIR/L_loa.gff g=$RFDIR/L_loa.fa \
 s=own i=N_americanus a=$RFDIR/N_americanus.gff g=$RFDIR/N_americanus.fa \
 s=own i=T_spiralis a=$RFDIR/T_spiralis.gff g=$RFDIR/T_spiralis.fa
+
+
+# Now run braker
+braker.pl --species=yourRhabdiasPseudo --genome=genome.fasta
