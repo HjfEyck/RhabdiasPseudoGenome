@@ -29,14 +29,14 @@ module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
--t 24 \
+get_organelle_from_reads.py \
+-t 16 \
 -1 $IL/mtDNA_toadrem_Paired_F.fastq \
 -2 $IL/mtDNA_toadrem_Paired_R.fastq \
 -s $MT \
--w 105 \
 -F animal_mt \
--o mtDNA_toadrem_W105
+--spades-options "--isolate " \
+-o mtDNA_toadrem_adapterrem_isolate
 
 
 # Now try without a seed
