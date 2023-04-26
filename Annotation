@@ -1,0 +1,39 @@
+# We have already masked repetitive regions from the use of repeatmasker for the annotation of repeat sequences
+# First I masked numts in the final assembly that had already masked repeats, using NUMTfinder from slimsuite to model the NUMTs, and bedtools to mask them.
+
+cd /srv/scratch/z5228384/RhabGenomePaper/PostAssembly/NumtMasking
+NUMT=/srv/scratch/z5228384/tools/numtfinder/code/
+module load bedtools2/2.30.0
+$NUMT/numtfinder.py forks=8 seqin=Step_8_FinalTidy.diploidocus.fasta.masked mtdna= basefile=./numtMASKED
+bedtools maskfasta -fi Step_8_FinalTidy.diploidocus.fasta.masked -bed numtMASKED.numtsearch.unique.gff -fo Step_8_FinalTidy.diploidocus_repmasked_numtmasked.fasta 
+
+# Now that repeats and NUMTs are masked, we can annotate using GeMoMa and braker
+#First GeMoMa
+
+#Navigate to working directory
+cd /srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation
+#Define variables
+JAR=/home/z5228384/miniconda3/share/gemoma-1.7.1-0/GeMoMa-1.7.1.jar
+PPN=16
+export JAVA_TOOL_OPTIONS="-Xmx120g"
+export _JAVA_OPTIONS="-Xmx120"
+TARGET=
+RFDIR=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/referenceGenomes
+java -Xmx247G -jar /srv/scratch/z5228384/condaACTUAL/miniconda3/share/gemoma-1.7.1-0/GeMoMa-1.7.1.jar CLI GeMoMaPipeline \
+threads=$PPN \
+t=$TARGET \
+outdir=RhabGem_10species \
+tblastn=false \
+GeMoMa.m=15000 \
+GeMoMa.Score=ReAlign \
+AnnotationFinalizer.r=NO \
+s=own i=C_elegans a=$RFDIR/C_elegans.gff g=$RFDIR/C_elegans.fa \
+s=own i=C_briggsae a=$RFDIR/C_briggsae.gff g=$RFDIR/C_briggsae.fa \
+s=own i=C_nigoni a=$RFDIR/C_nigoni.gff g=$RFDIR/C_nigoni.fa \
+s=own i=C_remanei a=$RFDIR/C_remanei.gff g=$RFDIR/C_remanei.fa \
+s=own i=P_pacificus a=$RFDIR/P_pacificus.gff g=$RFDIR/P_pacificus.fa \
+s=own i=S_carpocapsae a=$RFDIR/S_carpocapsae.gff g=$RFDIR/S_carpocapsae.fa \
+s=own i=S_ratti2 a=$RFDIR/S_ratti.gff g=$RFDIR/S_ratti.fa \
+s=own i=L_loa a=$RFDIR/L_loa.gff g=$RFDIR/L_loa.fa \
+s=own i=N_americanus a=$RFDIR/N_americanus.gff g=$RFDIR/N_americanus.fa \
+s=own i=T_spiralis a=$RFDIR/T_spiralis.gff g=$RFDIR/T_spiralis.fa
