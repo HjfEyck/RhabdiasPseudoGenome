@@ -33,8 +33,8 @@ MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
 python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -t 16 \
--1 $IL/Rhab_forward.fastq.gz \
--2 $IL/Rhab_reverse.fastq.gz \
+-1 $IL/Rhab_forward.fastq \
+-2 $IL/Rhab_reverse.fastq \
 -s $MT \
 --reduce-reads-for-coverage inf \
 --max-reads inf \
