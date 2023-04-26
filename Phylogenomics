@@ -20,7 +20,8 @@ done
 
 # My next task was to decide on a cutoff for busco quality. Some of the busco scores of the assemblies were low
 # This paper "A Practical Guide to Design and Assess a Phylogenomic Study" indicates a cutoff of 80% could be valid
-# Here I checked and removed the buscos lower than 80% from the directory
+# However it is known the nematoda_odb10 has some bias towards certain clades, and against tylenchina species, so it makes sense to lower this threshold given that knowledge
+# Here I checked and removed the buscos lower than 65% from the directory
 for dir in /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/ncbi_dataset/data/FinishedBuscoFolders/*/; do
     for file in "$dir"/*.txt; do
         species=$(basename "$dir")
@@ -31,11 +32,14 @@ done
 sed 's/^.*C:\([0-9.]*%\).*$/\1/' output.txt > BuscoScores.txt
 cut -f 1 output.txt > AssemblyNames.txt
 paste AssemblyNames.txt BuscoScores.txt > FinalBuscoScores.txt
-# I then used excel to see which are less than 80% and generated a list of them called LowBuscoScores.csv
+# I then used excel to see which are less than 65% and generated a list of them called LowBuscoScores.csv
 mkdir LowBuscos
 cut -d ',' -f 1 LowBuscoScores.csv | tr -d '\r' | xargs -I {} mv {} LowBuscos/ # this will move the low scoring busco folders to a folder called LowBuscoScores
 
-# now that i had a cleaned dataset, next i needed to get all the single copy genes from every species, rename them accordingly, then put them all in a directory together for further analysis
+#It is also worth noting i cannot apply this 70% cutoff to the outgroup, because it wont have very high scores compared to nematoda_odb10, but is needed for the analysis.
+
+# Once I have the single copy busco amino acids from the species set that I want, next i needed to get all the single copy genes from every species,
+    #rename them accordingly, then put them all in a directory together for further analysis
 
 # Loop through original subdirectories
 for dir in */; do
