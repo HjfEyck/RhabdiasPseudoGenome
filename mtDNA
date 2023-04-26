@@ -13,14 +13,16 @@ java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2
 module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
-IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads/mtDNA_READS
-python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
--t 24 \
--1 $IL/mtDNA_Raw_Paired_F.fastq \
--2 $IL/mtDNA_Raw_Paired_R.fastq \
+IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+get_organelle_from_reads.py \
+-t 16 \
+-1 $IL/Rhab_forward.fastq.gz \
+-2 $IL/Rhab_reverse.fastq.gz \
 -s $MT \
+--reduce-reads-for-coverage inf \
+--max-reads inf \
 -F animal_mt \
--o mtDNA2
+-o mtDNA_rawReads_26_04_23
 
 
 
@@ -31,12 +33,15 @@ MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
 get_organelle_from_reads.py \
 -t 16 \
--1 $IL/mtDNA_toadrem_Paired_F.fastq \
--2 $IL/mtDNA_toadrem_Paired_R.fastq \
+-1 $IL/Rhab_forward.fastq.gz \
+-2 $IL/Rhab_reverse.fastq.gz \
 -s $MT \
+--reduce-reads-for-coverage inf \
+--max-reads inf \
 -F animal_mt \
 --spades-options "--isolate " \
--o mtDNA_toadrem_adapterrem_isolate
+-o mtDNA_rawReads_26_04_23_isolate
+
 
 
 # Now try without a seed
