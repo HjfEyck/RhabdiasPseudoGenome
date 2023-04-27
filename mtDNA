@@ -43,29 +43,18 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -o mtDNA_rawReads_26_04_23_isolate
 
 
-
-# Now try without a seed
-module load perl python spades bowtie2 blast-plus
+# THIS IS THE ONE I AM POLISHING
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
+MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
--t 24 \
--1 $IL/mtDNA_toadrem_Paired_F.fastq \
--2 $IL/mtDNA_toadrem_Paired_R.fastq \
--F animal_mt \
--o mtDNA_noseed
-
-# Now try with P. pacificus mitogenome. It is similar level of differentiation from rhabdias as c. elegans
-module load perl python spades bowtie2 blast-plus
-cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
-MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/NC_015245.1_P_pacificus_mtDNA.fasta
-IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
--t 24 \
--1 $IL/mtDNA_toadrem_Paired_F.fastq \
--2 $IL/mtDNA_toadrem_Paired_R.fastq \
+get_organelle_from_reads.py \
+-t 16 \
+-1 $IL/ToadRem_1.fastq.gz \
+-2 $IL/ToadRem_2.fastq.gz \
 -s $MT \
 -F animal_mt \
--o mtDNA_pacificus_ref
+-R 15 \
+-w 125 \
+-o mtDNA_trimReads_27_04_2_R15_w125
 
 meangs.py -1 $IL/mtDNA_toadrem_Paired_F.fastq -2 $IL/mtDNA_toadrem_Paired_R.fastq -i 370 -o MEANGS1 -t 8 --deepin --clip --silence --species_class Nematoda 
