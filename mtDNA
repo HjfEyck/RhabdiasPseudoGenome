@@ -57,4 +57,7 @@ get_organelle_from_reads.py \
 -w 125 \
 -o mtDNA_trimReads_27_04_2_R15_w125
 
+bwa mem -t 30 selected_sequences.fasta ../../../../../Reads/IlluminaReads/Rhab_forward.fastq ../../../../../Reads/IlluminaReads/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtool
+s sort -@ 30 -o mapped_sorted.bam
+
 meangs.py -1 $IL/mtDNA_toadrem_Paired_F.fastq -2 $IL/mtDNA_toadrem_Paired_R.fastq -i 370 -o MEANGS1 -t 8 --deepin --clip --silence --species_class Nematoda 
