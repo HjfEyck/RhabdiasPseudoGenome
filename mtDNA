@@ -75,3 +75,29 @@ OUTDIR=flyeMITO
 # genome size estimate is Celegans mitogenome legth
 python $FLYE/flye --nano-raw LongreadMito.fastq --out-dir $OUTDIR --genome-size 13794k --threads 30
 
+#Then hypo polish
+#map short and long reads to the assembly for hypo
+IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+minimap2 -t 30 -a -x sr assembly.fasta $IL/Rhab_forward.fastq $IL/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 - -o mito_HypoSR_sorted.bam
+# map long reads for hypo
+ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+minimap2 -t 30 -a -x map-ont assembly.fasta $ONT | samtools view -@ 30 -b - | samtools sort -@ 30 - -o mito_HypoLR_sorted.bam
+#get an estimation of short read depth for hypo. use celegans genome length as a reasonable-ish estimate
+samtools depth -@ 30 mito_HypoSR_sorted.bam | awk '{sum+=$3} END { print "Average = ",sum/13794k}'
+#run hypo. This was run on High compute node
+hypo -t 24 -r @il_names.txt -d assembly.fasta -b mito_HypoSR_sorted.bam -c 60.6509 -s 13794k -B mito_HypoLR_sorted.bam -p 96 -o hypo_mito.fa
+
+
+
+#OR 
+# rather than mapping to get reads for mitogenome, extract them using getorganelle
+MT=C.ElegansmtDNAsequence.fasta
+ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+get_organelle_from_reads.py \
+-t 30 \
+-u $ONT \
+-s $MT \
+-F animal_mt \
+-R 40 \
+--spades-options "--isolate " \
+-o mtDNA_longread_AllLongReads_isolate_r40
