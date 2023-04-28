@@ -78,8 +78,22 @@ for dir in */; do
 
 done
 
+# The next step is to create a list of the peptides and which species has each of them
+# This is done because I want to exclude peptides that are not present in at least 3 different species
+# First you must copy each full_table.tsv file from each species into a new folder, and name each of them 
+#create list of peptides
 
 
+for file in full_table_*.tsv
+do
+grep -v "^#" ${file} | awk '$2=="Complete" {print $1}' >> complete_busco_ids.txt
+done
+sort complete_busco_ids.txt |uniq -c > complete_busco_ids_with_counts.txt
+awk '$NF >  0 {print $2}' complete_busco_ids_with_counts.txt >  final_busco_ids.txt
+
+while read line; do
+cat *_${line}.faa > /srv/scratch/z5228384/MysteryWorm/BuscoPhylo/speciesfiles/DEC/${line}_aa.fasta;
+done<final_busco_ids.txt
 
 
 
