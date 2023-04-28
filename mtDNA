@@ -65,3 +65,13 @@ get_organelle_from_reads.py \
 -R 30 \
 --spades-options "--isolate " \
 -o mtDNA_longread_isolate_r30
+
+
+#Or assemble with flye
+module load python
+FLYE=/srv/scratch/z5228384/tools/Flye/bin
+OUTDIR=flyeMITO
+#run job
+# genome size estimate is Celegans mitogenome legth
+python $FLYE/flye --nano-raw LongreadMito.fastq --out-dir $OUTDIR --genome-size 13794k --threads 30
+
