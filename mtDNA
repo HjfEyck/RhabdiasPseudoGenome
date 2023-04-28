@@ -45,26 +45,28 @@ pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid -
 gfastats  -o gfa // converts fasta to gfa
 
 
+# Method 2 Gox2
+# After The first round of getorganelle, run it a second time with the extracted reads from the first round
+cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/pipeline/mtDNA_toadrem_adapterrem_isolate
+MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
+python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
+-t 16 \
+-1 extended_1_paired.fq \
+-2 extended_2_paired.fq \
+-s $MT \
+-F animal_mt \
+--spades-options "--isolate " \
+-o mtDNA_method2_round2_toadrem_adapterrem_isolate
+# then polish or ciclator or both
 
 
-
-# Method 2 with longreads
+# Method 3 with longreads
 # first mapped all long reads to the Celegans mitogenome, extract only the mapped reads, then sort them
 ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
 minimap2 -t 30 -a -x map-ont C.ElegansmtDNAsequence.fasta $ONT | samtools view -@ 30 -b -F 4 - | samtools sort -@ 30 -o mapped_sorted.bam -
 # Then extract the mapped reads as fastq
 samtools bam2fq -@ 30 mapped_sorted.bam > LongreadMito.fastq
-#then use getorganelle to try to assemble these reads
-MT=C.ElegansmtDNAsequence.fasta
-READS=LongreadMito.fastq
-get_organelle_from_reads.py \
--t 30 \
--u $READS \
--s $MT \
--F animal_mt \
--R 30 \
---spades-options "--isolate " \
--o mtDNA_longread_isolate_r30
+
 
 
 #Or assemble with flye
@@ -89,7 +91,7 @@ hypo -t 24 -r @il_names.txt -d assembly.fasta -b mito_HypoSR_sorted.bam -c 60.65
 
 
 
-#OR 
+# Method 4, extract reads using GO
 # rather than mapping to get reads for mitogenome, extract them using getorganelle
 MT=C.ElegansmtDNAsequence.fasta
 ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
@@ -101,3 +103,8 @@ get_organelle_from_reads.py \
 -R 40 \
 --spades-options "--isolate " \
 -o mtDNA_longread_AllLongReads_isolate_r40
+# then assemble the extracted reads
+
+
+
+# Method 5, GOx2 with longreads, then polish and circlate
