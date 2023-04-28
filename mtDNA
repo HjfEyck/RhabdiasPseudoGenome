@@ -9,55 +9,37 @@ module load java/8u292-b10-openjdk
 TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
 java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2.fastq.gz mtDNA_toadrem_Paired_F.fastq mtDNA_toadrem_Unpaired_F.fastq mtDNA_toadrem_Paired_R.fastq mtDNA_toadrem_Unpaired_R.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
 
-# Now we can use these to generate the mitogenome using the C. elegans mitogenome as a seed file
-module load perl python spades bowtie2 blast-plus
-cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
-MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
-IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-get_organelle_from_reads.py \
--t 16 \
--1 $IL/Rhab_forward.fastq.gz \
--2 $IL/Rhab_reverse.fastq.gz \
--s $MT \
---reduce-reads-for-coverage inf \
---max-reads inf \
--F animal_mt \
--o mtDNA_rawReads_26_04_23
-
-
-
-# With some extra parameters
 module load perl python spades bowtie2 blast-plus
 cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
 MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
 IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
 python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -t 16 \
--1 $IL/Rhab_forward.fastq \
--2 $IL/Rhab_reverse.fastq \
+-1 $IL/mtDNA_toadrem_Paired_F.fastq \
+-2 $IL/mtDNA_toadrem_Paired_R.fastq \
 -s $MT \
---reduce-reads-for-coverage inf \
---max-reads inf \
 -F animal_mt \
 --spades-options "--isolate " \
--o mtDNA_rawReads_26_04_23_isolate
+-o mtDNA_toadrem_adapterrem_isolate
 
+# Then in bandage, removed low coverage artifacts, and deleted dead ends that were no identified from a blast search.
+# Then merged all possible nodes, which left a single bifurcation.
+# Polished with short reads try to clear up this bifurcation
 
-# THIS IS THE ONE I AM POLISHING
-cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
-MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
-IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-get_organelle_from_reads.py \
--t 16 \
--1 $IL/ToadRem_1.fastq.gz \
--2 $IL/ToadRem_2.fastq.gz \
--s $MT \
--F animal_mt \
--R 15 \
--w 125 \
--o mtDNA_trimReads_27_04_2_R15_w125
+#If polishing doesnt work, we went with the sequence in the bifurcation that had the greatest depth
+#Then polished in an attampt to merge the sequences
 
-bwa mem -t 30 selected_sequences.fasta ../../../../../Reads/IlluminaReads/Rhab_forward.fastq ../../../../../Reads/IlluminaReads/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtool
-s sort -@ 30 -o mapped_sorted.bam
+bwa mem -t 30 contigs_merged.fasta ../../../../../Reads/IlluminaReads/Rhab_forward.fastq ../../../../../Reads/IlluminaReads/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 -o mapped_sorted.bam
 
-meangs.py -1 $IL/mtDNA_toadrem_Paired_F.fastq -2 $IL/mtDNA_toadrem_Paired_R.fastq -i 370 -o MEANGS1 -t 8 --deepin --clip --silence --species_class Nematoda 
+bwa mem -t 30 DeadendsIncluded.fasta ../../../../../Reads/IlluminaReads/Rhab_forward.fastq ../../../../../Reads/IlluminaReads/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 -o mapped_sorted.bam
+
+conda activate sspace_env # pilon is installed here
+module load java/11.0.17_8-openjdk # this needs to be installed to run pilon
+BAM=mapped_sorted.bam
+Prefix=mitopolish
+PPN=30
+GENOME=contigs_merged.fasta
+pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid --verbose --changes --threads $PPN --fix indels 2>&1 | tee ${PREFIX}.log.tx
+
+# generate gfa plot to see if the genome is circular
+gfastats  -o gfa // converts fasta to gfa
