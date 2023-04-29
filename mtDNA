@@ -55,6 +55,8 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -2 extended_2_paired.fq \
 -s $MT \
 -F animal_mt \
+--reduce-reads-for-coverage inf \
+--max-reads inf \
 --spades-options "--isolate " \
 -o mtDNA_method2_round2_toadrem_adapterrem_isolate
 # then polish or ciclator or both
@@ -93,7 +95,7 @@ hypo -t 24 -r @il_names.txt -d assembly.fasta -b mito_HypoSR_sorted.bam -c 33556
 
 # Method 4, extract reads using GO
 # rather than mapping to get reads for mitogenome, extract them using getorganelle
-MT=C.ElegansmtDNAsequence.fasta
+MT=../C.ElegansmtDNAsequence.fasta
 ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
 get_organelle_from_reads.py \
 -t 30 \
@@ -101,6 +103,7 @@ get_organelle_from_reads.py \
 -s $MT \
 -F animal_mt \
 -R 40 \
+--memory-save \
 --spades-options "--isolate " \
 -o mtDNA_longread_AllLongReads_isolate_r40
 # then assemble the extracted reads
