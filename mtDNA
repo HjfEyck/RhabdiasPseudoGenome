@@ -19,6 +19,8 @@ python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
 -2 $IL/mtDNA_toadrem_Paired_R.fastq \
 -s $MT \
 -F animal_mt \
+--reduce-reads-for-coverage inf \
+--max-reads inf \
 --spades-options "--isolate " \
 -o mtDNA_toadrem_adapterrem_isolate
 
