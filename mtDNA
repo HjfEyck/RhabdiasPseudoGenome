@@ -1,115 +1,38 @@
 # Assembling the mtDNA for Rhabdias pseudosphaerocephala
 
 # First I wanted to use raw data that had toad reads removed and no adapters, but had NOT been quality controlled
-# mtDNA assemblers seem (from my reading) to usually use truly raw reads, but I did not want to have toad reads in my data, nor adapters
-# Chromodorean nematode should have all genes on the same strand of the mitogenome, and this is not true of toads
-# so it will probably be easy to spot a wrongly assembled gene  
-# To trim the new dataset i used trimmomatic
+# GetOrganelle reccomends using raw reads with no adapters, but I did not want to have toad reads in my data, so i used data that had toad reads removed (created prior to genome assembly)
+# To remove adapters used trimmomatic, but did not quality trim
 module load java/8u292-b10-openjdk
 TRIM=/srv/scratch/z5228384/tools/Trimmomatic-0.39
 java -jar $TRIM/trimmomatic-0.39.jar PE -threads 24 ToadRem_1.fastq.gz ToadRem_2.fastq.gz mtDNA_toadrem_Paired_F.fastq mtDNA_toadrem_Unpaired_F.fastq mtDNA_toadrem_Paired_R.fastq mtDNA_toadrem_Unpaired_R.fastq ILLUMINACLIP:$TRIM/adapters/TruSeq3-PE.fa/:2:30:10
 
-module load perl python spades bowtie2 blast-plus
-cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/getOrganelle
-MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
-IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
--t 16 \
+# This is the code used for the mitochondrial assembly
+# Rhabdias kafunata was used as the seed
+
+conda activate mtdna_env
+conda install -c bioconda getorganelle
+module load perl python spades bowtie2 blast-plus # dependencies needed
+get_organelle_from_reads.py \
+-t 30 \
 -1 $IL/mtDNA_toadrem_Paired_F.fastq \
 -2 $IL/mtDNA_toadrem_Paired_R.fastq \
 -s $MT \
 -F animal_mt \
---reduce-reads-for-coverage inf \
---max-reads inf \
 --spades-options "--isolate " \
--o mtDNA_toadrem_adapterrem_isolate
+-o mtDNA_toadrem_adapterrem_isolate_RhabKafu
 
-# Then in bandage, removed low coverage artifacts, and deleted dead ends that were no identified from a blast search.
-# Then merged all possible nodes, which left a single bifurcation.
-# Polished with short reads try to clear up this bifurcation
+# This produced a circular genome assembly with each gene on the same strand (expected in chromodorean nematodes)
 
-#If polishing doesnt work, we went with the sequence in the bifurcation that had the greatest depth
-#Then polished in an attampt to merge the sequences
-
-bwa mem -t 30 contigs_merged.fasta ../../../../../Reads/IlluminaReads/Rhab_forward.fastq ../../../../../Reads/IlluminaReads/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 -o mapped_sorted.bam
-
-bwa mem -t 30 DeadendsIncluded.fasta ../../../../../Reads/IlluminaReads/Rhab_forward.fastq ../../../../../Reads/IlluminaReads/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 -o mapped_sorted.bam
-
-conda activate sspace_env # pilon is installed here
+# Attempted to polish the assembly using pilon
+bwa index animal_mt.K115.complete.graph1.1.path_sequence.fasta
+bwa mem -t 30 animal_mt.K115.complete.graph1.1.path_sequence.fasta $IL/Rhab_forward.fastq $IL/Rhab_.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 -o mapped_sorted.bam
+samtools index -@ 30 mapped_sorted.bam
 module load java/11.0.17_8-openjdk # this needs to be installed to run pilon
 BAM=mapped_sorted.bam
 Prefix=mitopolish
 PPN=30
-GENOME=contigs_merged.fasta
+GENOME=animal_mt.K115.complete.graph1.1.path_sequence.fasta
 pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid --verbose --changes --threads $PPN --fix indels 2>&1 | tee ${PREFIX}.log.tx
+# no changes were made by pilon
 
-# generate gfa plot to see if the genome is circular
-gfastats  -o gfa // converts fasta to gfa
-
-
-# Method 2 Gox2
-# After The first round of getorganelle, run it a second time with the extracted reads from the first round
-cd /srv/scratch/z5228384/RhabGenomePaper/mtDNA/pipeline/mtDNA_toadrem_adapterrem_isolate
-MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/C.ElegansmtDNAsequence.fasta
-python /srv/scratch/z5228384/tools/GetOrganelle/get_organelle_from_reads.py \
--t 16 \
--1 extended_1_paired.fq \
--2 extended_2_paired.fq \
--s $MT \
--F animal_mt \
---reduce-reads-for-coverage inf \
---max-reads inf \
---spades-options "--isolate " \
--o mtDNA_method2_round2_toadrem_adapterrem_isolate
-# then polish or ciclator or both
-
-
-# Method 3 with longreads
-# first mapped all long reads to the Celegans mitogenome, extract only the mapped reads, then sort them
-ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
-minimap2 -t 30 -a -x map-ont C.ElegansmtDNAsequence.fasta $ONT | samtools view -@ 30 -b -F 4 - | samtools sort -@ 30 -o mapped_sorted.bam -
-# Then extract the mapped reads as fastq
-samtools bam2fq -@ 30 mapped_sorted.bam > LongreadMito.fastq
-
-
-
-#Or assemble with flye
-module load python
-FLYE=/srv/scratch/z5228384/tools/Flye/bin
-OUTDIR=flyeMITO
-#run job
-# genome size estimate is Celegans mitogenome legth
-python $FLYE/flye --nano-raw LongreadMito.fastq --out-dir $OUTDIR --genome-size 13794k --threads 30
-
-#Then hypo polish
-#map short and long reads to the assembly for hypo
-IL=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-minimap2 -t 30 -a -x sr assembly.fasta $IL/Rhab_forward.fastq $IL/Rhab_reverse.fastq | samtools view -@ 30 -b - | samtools sort -@ 30 - -o mito_HypoSR_sorted.bam
-# map long reads for hypo
-ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
-minimap2 -t 30 -a -x map-ont assembly.fasta $ONT | samtools view -@ 30 -b - | samtools sort -@ 30 - -o mito_HypoLR_sorted.bam
-#get an estimation of short read depth for hypo. use celegans genome length as a reasonable-ish estimate
-samtools depth -@ 30 mito_HypoSR_sorted.bam | awk '{sum+=$3} END { print "Average = ",sum/13794k}'
-#run hypo. This was run on High compute node
-hypo -t 24 -r @il_names.txt -d assembly.fasta -b mito_HypoSR_sorted.bam -c 335560 -s 13794k -B mito_HypoLR_sorted.bam -p 96 -o hypo_mito.fa
-
-
-
-# Method 4, extract reads using GO
-# rather than mapping to get reads for mitogenome, extract them using getorganelle
-MT=../C.ElegansmtDNAsequence.fasta
-ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
-get_organelle_from_reads.py \
--t 30 \
--u $ONT \
--s $MT \
--F animal_mt \
--R 40 \
---memory-save \
---spades-options "--isolate " \
--o mtDNA_longread_AllLongReads_isolate_r40
-# then assemble the extracted reads
-
-
-
-# Method 5, GOx2 with longreads, then polish and circlate
