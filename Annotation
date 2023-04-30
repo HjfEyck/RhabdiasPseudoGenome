@@ -3,8 +3,9 @@
 
 cd /srv/scratch/z5228384/RhabGenomePaper/PostAssembly/NumtMasking
 NUMT=/srv/scratch/z5228384/tools/numtfinder/code/
-module load bedtools2/2.30.0
-$NUMT/numtfinder.py forks=8 seqin=Step_8_FinalTidy.diploidocus.fasta.masked mtdna= basefile=./numtMASKED
+MT=/srv/scratch/z5228384/RhabGenomePaper/mtDNA/FinalmtDNA/animal_mt.K115.complete.graph1.1.path_sequence.fasta
+module load bedtools2/2.30.0 python
+python2 $NUMT/numtfinder.py forks=24 seqin=Step_8_FinalTidy.diploidocus.fasta.masked mtdna=$MT basefile=./numtMASKED
 bedtools maskfasta -fi Step_8_FinalTidy.diploidocus.fasta.masked -bed numtMASKED.numtsearch.unique.gff -fo Step_8_FinalTidy.diploidocus_repmasked_numtmasked.fasta 
 
 # Next step was to simplify the contigs names in the assembly, which is recommended by Braker2 https://github.com/Gaius-Augustus/BRAKER
