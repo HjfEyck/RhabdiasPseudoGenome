@@ -9,21 +9,25 @@ python2 $NUMT/numtfinder.py forks=24 seqin=Step_8_FinalTidy.diploidocus.fasta.ma
 bedtools maskfasta -fi Step_8_FinalTidy.diploidocus.fasta.masked -bed numtMASKED.numtsearch.unique.gff -fo Step_8_FinalTidy.diploidocus_repmasked_numtmasked.fasta 
 
 # Next step was to simplify the contigs names in the assembly, which is recommended by Braker2 https://github.com/Gaius-Augustus/BRAKER
+# Headers currently look like ">scaffold1288_size5585_pilon"
+sed 's/^>\(.*\)_size.*/>\1/' Step_8_FinalTidy.diploidocus_repmasked_numtmasked.fasta > Step_8_FinalTidy.diploidocus_repmasked_numtmasked_cleanHeaders.fasta
+#Headers now are only ">scaffold1288"
 
+# Now that repeats and NUMTs are masked in the assembly, we can annotate it using GeMoMa and braker
 
-# Now that repeats and NUMTs are masked, we can annotate using GeMoMa and braker
 #First GeMoMa
-
 #Navigate to working directory
 cd /srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation
+conda activate annotation_env
+conda install -c bioconda gemoma
 #Define variables
-JAR=/home/z5228384/miniconda3/share/gemoma-1.7.1-0/GeMoMa-1.7.1.jar
-PPN=16
-export JAVA_TOOL_OPTIONS="-Xmx120g"
-export _JAVA_OPTIONS="-Xmx120"
-TARGET=
+PPN=24
+export JAVA_TOOL_OPTIONS="-Xmx247G"
+export _JAVA_OPTIONS="-Xmx247G"
+TARGET=Step_8_FinalTidy.diploidocus_repmasked_numtmasked_cleanHeaders.fasta
 RFDIR=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/referenceGenomes
-java -Xmx247G -jar /srv/scratch/z5228384/condaACTUAL/miniconda3/share/gemoma-1.7.1-0/GeMoMa-1.7.1.jar CLI GeMoMaPipeline \
+# Run gemoma
+GeMoMa GeMoMaPipeline \
 threads=$PPN \
 t=$TARGET \
 outdir=RhabGem_10species \
