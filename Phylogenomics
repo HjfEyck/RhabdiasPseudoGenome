@@ -80,8 +80,19 @@ done
 
 # The next step is to create a list of the peptides and which species has each of them
 # This is done because I want to exclude peptides that are not present in at least 3 different species
-# First you must copy each full_table.tsv file from each species into a new folder, and name each of them 
+
+# First must copy each full_table.tsv file from each species into a new folder, and name each of them 
 #create list of peptides
+First need to get the busco files in a folder, with only those which are included (i.e. not too low busco score).
+ls SingleCopyAminoAcid > list.txt
+sed -i 's/\(.*genomic\).*/\1/' list.txt # remove the amino acid names
+sed -i 's/\(.*RhabdiasPseudo\).*/\1/' list.txt # removes the amino acid names from Rpseudo busco
+sort list.txt | uniq > list_unique.txt # remove duplicates
+# list_unique.txt now contains tha names of the busco files we need
+# Now we move the busco folders to a new directory which contains only the Busco folders in the final analysis
+xargs -a list_unique.txt -I {} sh -c 'mkdir -p usedBuscos && mv {} usedBuscos' sh
+
+
 
 
 for file in full_table_*.tsv
