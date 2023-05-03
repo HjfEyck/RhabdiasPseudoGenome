@@ -43,43 +43,31 @@ cut -d ',' -f 1 LowBuscoScores.csv | tr -d '\r' | xargs -I {} mv {} LowBuscos/ #
 
 # Loop through original subdirectories
 for dir in */; do
-
     # Change to single_copy_busco_sequences subdirectory
     cd $dir/run_nematoda_odb10/busco_sequences/single_copy_busco_sequences
-
     # Get abbreviation for directory name
     abbrv=$(basename $dir)
-
     # Make renamed directory
     mkdir renamed
-
     # Loop through .faa files in single_copy_busco_sequences directory
     for file in *.faa; do
-
         # Copy file to renamed directory with abbreviation in name
         cp $file renamed/${abbrv}_${file}
-
         # Replace > with >$abbrv| in copied file
         sed -i "s/^>/>$abbrv|/" renamed/${abbrv}_${file}
-
         # Convert sequence names to upper case and write to new file
         cut -f 1 -d ":" renamed/${abbrv}_${file} | tr '[:lower:]' '[:upper:]' > renamed/${abbrv}_${file}.1
-
         # Move new file to original file name
         mv renamed/${abbrv}_${file}.1 renamed/${abbrv}_${file}
-
     done
-
     # Move everything to foldder for further analysis
     mv renamed/* /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/SingleCopyAminoAcids
-
     # Change back to original directory
     cd ../../../../
-
 done
 
 # The next step is to create a list of the peptides and which species has each of them
-# This is done because I want to exclude peptides that are not present in at least 3 different species
+# This is done because I want to exclude peptides that are not present in at least 2 different species
 
 # First must copy each full_table.tsv file from each species into a new folder, and name each of them 
 #create list of peptides
