@@ -48,4 +48,26 @@ s=own i=T_spiralis a=$RFDIR/T_spiralis.gff g=$RFDIR/T_spiralis.fa
 
 
 # Now run braker
+
+module load braker cdbfasta/
+
+WORKDIR="/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/braker"
+
+# Because we dont have the permission of this directory. Copy over #
+cp -r /apps/z_install_tree/linux-rocky8-ivybridge/gcc-12.2.0/augustus-3.4.0-duwzji3wkoy43fsbfld4uedt7jxrojr5/config/ $WORKDIR/
+# CHange the variable to our newly copied directory
+export AUGUSTUS_CONFIG_PATH="/srv/scratch/canetoad/CaneToad-Jan18/annotation/2023-03-29.braker2/config"
+
+#specify genome
+GENOME="/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/Step_8_FinalTidy.diploidocus_repmasked_numtmasked_cleanHeaders.fasta"
+
+# Katana's BRAKER missed scripts/ folder. Mis-named as lib/ #
+# copy the lib/ folder and name it as scripts/ to working directory (Because the program will look for scripts in the working directory as well #
+mkdir scripts/
+cp -r /apps/z_install_tree/linux-rocky8-ivybridge/gcc-12.2.0/braker-2.1.6-qtiqf7qgxmbxeabbzejrpjh2k6v2ig2l/lib scripts/
+# make sure biopython is installed
+pip3 install biopython
+
+braker.pl --species Rpseudo --genome=$GENOME --softmasking --cores 16 --workingdir $WORKDIR/BRAKER.run --gff3
+
 braker.pl --species=yourRhabdiasPseudo --genome=genome.fasta
