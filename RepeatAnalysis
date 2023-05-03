@@ -29,7 +29,8 @@ Combine all of the repeats into a single database
 cat *.fa > RepBase_LTR_repmodel.fa
 
 # Use repeatmasker using this database
-RepeatMasker -pa 24 -lib RepBase_LTR_repmodel.fa -xsmall -dir RepeatDatabase_softmask Step_8_FinalTidy.diploidocus.fasta
+mkdir RepeatDatabase_softmask
+RepeatMasker -pa 24 -lib RepBase_LTR_repmodel.fa -xsmall -dir ./RepeatDatabase_softmask Step_8_FinalTidy.diploidocus.fasta
 
 grep "SINEs\|LINEs\|LTR\|DNA\|Unclassified\|Total\|Small\|Satellites\|Simple\|Low" Step_8_FinalTidy.diploidocus.fasta.tbl | sed 's/%\|://g' | sed 's/$/\tstep8/' > repeats_summary.txt
 
