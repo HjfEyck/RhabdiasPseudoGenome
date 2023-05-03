@@ -92,18 +92,37 @@ sort list.txt | uniq > list_unique.txt # remove duplicates
 # Now we move the busco folders to a new directory which contains only the Busco folders in the final analysis
 xargs -a list_unique.txt -I {} sh -c 'mkdir -p usedBuscos && mv {} usedBuscos' sh
 
+# Now I will extract the full_table.tsv files from each busco folder, rename them, and copy them to a new file
+root_dir="/srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/ncbi_dataset/data/FinishedBuscoFolders/usedBuscos"
+# create the new directory to move the files to
+mkdir tables
 
+# loop through each subdirectory
+for subdir in "${root_dir}"/*; do
+  # check if the subdirectory has the required subdirectory and file
+  if [ -d "${subdir}/run_nematoda_odb10" ] && [ -f "${subdir}/run_nematoda_odb10/full_table.tsv" ]; then
+    # get the name of the subdirectory
+    subdir_name=$(basename "${subdir}")
+    # copy the file to the new directory with the appropriate name
+    cp "${subdir}/run_nematoda_odb10/full_table.tsv" "tables/${subdir_name}.tsv"
+  fi
+done
 
-
-for file in full_table_*.tsv
+# This code will collate the tsvs, then print a list of the peptides that are present in more than 2 species
+for file in *.tsv
 do
 grep -v "^#" ${file} | awk '$2=="Complete" {print $1}' >> complete_busco_ids.txt
 done
+# take only uniq sequences
 sort complete_busco_ids.txt |uniq -c > complete_busco_ids_with_counts.txt
 awk '$NF >  0 {print $2}' complete_busco_ids_with_counts.txt >  final_busco_ids.txt
+# But this code was irrelevant because none had less than 17
 
+# This code is very important, it makes multifasta for each gene, with each multifasta containing the correct sequence from each peptide
+# With the output from this, we can begin to align and build trees
+cd SingleCopyAminoAcids
 while read line; do
-cat *_${line}.faa > /srv/scratch/z5228384/MysteryWorm/BuscoPhylo/speciesfiles/DEC/${line}_aa.fasta;
+cat *_${line}.faa > /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/${line}_aa.fasta;
 done<final_busco_ids.txt
 
 
