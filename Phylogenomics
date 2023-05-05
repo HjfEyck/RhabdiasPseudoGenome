@@ -126,6 +126,13 @@ python2 $SLIM/haqesac.py -seqin $FAA -basefile $PREFIX forks=8 i=-1 group=dup qr
 done
 
 
+mkdir mafft
+for file in *aa.fasta
+do
+mafft --localpair --maxiterate 1000 --thread 8 $file > mafft/${file%%_aa.fasta}"_aa_mafft.fasta"
+done
+
+
 # parallelise modelfinder for IQTREE
 # 
 mkdir output
