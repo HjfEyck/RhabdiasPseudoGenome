@@ -113,9 +113,17 @@ while read line; do
 cat *_${line}.faa > /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/${line}_aa.fasta;
 done<final_busco_ids.txt
 
-
-
-
+# next came alignment and tree building for each sequence. for this we can use haqesac, a slimsuite tool
+Here we can reuse the environment made for diploidocus, because it is a slimsuite tool too
+conda activate dip_env
+cd /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/9aa
+SLIM=/srv/scratch/z5228384/SLiMSuite/tools
+module add blast-plus/2.12.0 clustalw clustal-omega fasttree/2.1.11
+for FAA in *aa.fasta
+do
+PREFIX=$(basename ${FAA/.fasta/})
+python2 $SLIM/haqesac.py -seqin $FAA -basefile $PREFIX forks=8 i=-1 group=dup qryvar=T unkspec=F root=mid maketree=fasttree fasttree=fasttree query=1
+done
 
 
 # parallelise modelfinder for IQTREE
