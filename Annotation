@@ -49,6 +49,10 @@ s=own i=T_spiralis a=$RFDIR/T_spiralis.gff g=$RFDIR/T_spiralis.fa
 
 # Now run braker
 
+RAW=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads
+minimap2 -t 20 -a -x map-ont Step_8_FinalTidy.diploidocus_repmasked_numtmasked_cleanHeaders.fasta $RAW/rhabont_allreads_5000.fastq.gz | samtools view -@ 20 -S -b - | samtools sort -@ 20 - -o HypoLR_sorted.bam
+
+
 module load braker cdbfasta/
 
 WORKDIR="/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/braker"
