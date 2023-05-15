@@ -49,10 +49,6 @@ s=own i=T_spiralis a=$RFDIR/T_spiralis.gff g=$RFDIR/T_spiralis.fa
 
 # Now run braker
 
-RAW=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads
-minimap2 -t 20 -a -x map-ont Step_8_FinalTidy.diploidocus_repmasked_numtmasked_cleanHeaders.fasta $RAW/rhabont_allreads_5000.fastq.gz | samtools view -@ 20 -S -b - | samtools sort -@ 20 - -o HypoLR_sorted.bam
-
-
 module load braker cdbfasta/
 
 WORKDIR="/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/braker"
@@ -71,7 +67,17 @@ mkdir scripts/
 cp -r /apps/z_install_tree/linux-rocky8-ivybridge/gcc-12.2.0/braker-2.1.6-qtiqf7qgxmbxeabbzejrpjh2k6v2ig2l/lib scripts/
 # make sure biopython is installed
 pip3 install biopython
+# run in esmode because we only have a genome, and no rnaseq or protein data
+# check programs work
+check_install.bash
 
-braker.pl --species Rpseudo --genome=$GENOME --softmasking --cores 16 --workingdir $WORKDIR/BRAKER.run --gff3
+If a new key is needed
+wget http://topaz.gatech.edu/GeneMark/tmp/GMtool_IH8XG/gm_key_64.gz
+gunzip gm_key_64.gz
+cp gm_key_64 ~/.gm_key
+cd /mnt/griffin/chrwhe/software/braker_dependencies/gmes_linux_64/
+./check_install.bash
+
+braker.pl --species Rpseudo --genome=$GENOME --esmode --softmasking --cores 20 --workingdir $WORKDIR/BRAKER.run --gff3
 
 braker.pl --species=yourRhabdiasPseudo --genome=genome.fasta
