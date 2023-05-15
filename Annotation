@@ -74,7 +74,7 @@ check_install.bash
 If a new key is needed
 wget http://topaz.gatech.edu/GeneMark/tmp/GMtool_IH8XG/gm_key_64.gz
 gunzip gm_key_64.gz
-cp gm_key_64 ~/.gm_key
+mv gm_key_64 ~/.gm_key
 cd /mnt/griffin/chrwhe/software/braker_dependencies/gmes_linux_64/
 ./check_install.bash
 
