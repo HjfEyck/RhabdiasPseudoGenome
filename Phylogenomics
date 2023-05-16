@@ -119,11 +119,29 @@ conda activate dip_env
 cd /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/9aa
 SLIM=/srv/scratch/z5228384/SLiMSuite/tools
 module add blast-plus/2.12.0 clustalw clustal-omega fasttree/2.1.11
-for FAA in *aa.fasta
+
+# Have to change header name length for blast in haqesac
+# Trim everything but the species identifier and put them in a new folder
+mkdir HeadersShort
+for file in *.fasta
+do
+sed -E 's/^>([^_]+_[^_]+).*/>\1/' $file > HeadersShort/${file%%.fasta}"_shortheader.fasta"
+done
+cd HeadersShort
+
+# I want a cleaned alignment from haqesac, but I dont need a tree from it
+# I will build trees in iqtree2, I dont want to use fasttree, which is haqesacs way of tree building
+# specify gnspacc=F to stop it lengthening the species names and preventing blast from working
+# specify seqnr=F to stop it from removing sequences that are too similar. We dont want to do that here
+# specify unkspec=T so it doesnt skip unknown sequences
+# it will claim to have errors after each alignment, but this is only due to the fact we are not building trees and they can be ignored
+# It still prodices the cleaned alignment files despite these errors
+for FAA in *.fasta
 do
 PREFIX=$(basename ${FAA/.fasta/})
-python2 $SLIM/haqesac.py -seqin $FAA -basefile $PREFIX forks=8 i=-1 group=dup qryvar=T unkspec=F root=mid maketree=fasttree fasttree=fasttree query=1
+python2 $SLIM/haqesac.py -seqin $FAA gnspacc=F seqnr=F -basefile $PREFIX forks=8 i=-1 group=dup qryvar=T unkspec=T root=mid query=1
 done
+# we can then proceed with the .haq.fas alignment files
 
 
 mkdir mafft
