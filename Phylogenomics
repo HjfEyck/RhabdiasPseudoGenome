@@ -144,20 +144,8 @@ done
 # we can then proceed with the .haq.fas alignment files
 
 # Lets move them all into the same directory
+# this code is run for each directory 
 cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/9aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/8aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/7aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/6aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/5aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/4aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-cp /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/3aa/HeadersShort/HAQESAC/*.haq.fas /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/HAQESAC
-
-
-mkdir mafft
-for file in *aa.fasta
-do
-mafft --localpair --maxiterate 1000 --thread 8 $file > mafft/${file%%_aa.fasta}"_aa_mafft.fasta"
-done
 
 
 # parallelise modelfinder for IQTREE
