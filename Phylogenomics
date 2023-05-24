@@ -161,9 +161,11 @@ paste -d ': '  alignments.txt /dev/null seqs.txt > result.txt
 sort -k2 result.txt | head
 # 9998at6231_aa_shortheader.haq.fas was the onnly alignment removed (it had one), all others had 10 or above
 
-#with files in the same folder folder
-#create reference tree
-iqtree2 -p ./400min --prefix concat -bi 100 -B 1000 -T 24
+
+#create reference tree 
+# All alignments are stored in a folder called HAQESAC, we use -p to indicate that each alignment is its own partition in the broader analysis
+# it will estimate a separate model for each partition
+iqtree2 -p ./HAQESAC --prefix concat -bi 100 -B 1000 -T 24 -m MFP+MERGE
 #generate gene trees
 iqtree2 -S ./400min --prefix gene -T 24
 #generate gene concordance factors
