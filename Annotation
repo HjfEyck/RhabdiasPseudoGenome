@@ -46,6 +46,12 @@ s=own i=L_loa a=$RFDIR/L_loa.gff g=$RFDIR/L_loa.fa \
 s=own i=N_americanus a=$RFDIR/N_americanus.gff g=$RFDIR/N_americanus.fa \
 s=own i=T_spiralis a=$RFDIR/T_spiralis.gff g=$RFDIR/T_spiralis.fa
 
+GeMoMa AnnotationEvidence a=final_annotation.gff g=../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta
+
+number of detected CDS lines: 123888
+number of detected genes: 18066
+number of detected transcripts: 20475
+
 
 # Now run braker
 
@@ -71,7 +77,7 @@ pip3 install biopython
 # check programs work
 check_install.bash
 
-If a new key is needed
+# If a new key is needed, which is likely, we need to get a new one
 wget http://topaz.gatech.edu/GeneMark/tmp/GMtool_IH8XG/gm_key_64.gz
 gunzip gm_key_64.gz
 mv gm_key_64 ~/.gm_key
@@ -81,3 +87,15 @@ cd /mnt/griffin/chrwhe/software/braker_dependencies/gmes_linux_64/
 braker.pl --species Rpseudo --genome=$GENOME --esmode --softmasking --cores 20 --workingdir $WORKDIR/BRAKER.run --gff3
 
 braker.pl --species=yourRhabdiasPseudo --genome=genome.fasta
+
+GeMoMa AnnotationEvidence a=final_annotation.gff g=../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta
+number of detected CDS lines: 152174
+number of detected genes: 12978
+number of detected transcripts: 12978
+
+# Merge annotations from braker and gemoma
+GeMoMa GAF g=Braker_annotation_with_attributes.gff g=GeMoMa_annotation_with_attributes.gff outdir=./
+input   filtered transcripts    final transcripts supported     final genes supported
+input0        12497                 4584                            4584
+input1        20475                 18066                           18066
+
