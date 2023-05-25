@@ -165,7 +165,7 @@ sort -k2 result.txt | head
 #create reference tree 
 # All alignments are stored in a folder called HAQESAC, we use -p to indicate that each alignment is its own partition in the broader analysis
 # it will estimate a separate model for each partition
-iqtree2 -p ./HAQESAC --prefix concat -bi 100 -B 1000 -T 24 -m MFP+MERGE
+iqtree2 -p ./HAQESAC --prefix concat -bi 100 -B 1000 -T 24 -m MFP+MERGE --symtest-remove-bad
 #generate gene trees
 iqtree2 -S ./400min --prefix gene -T 24
 #generate gene concordance factors
