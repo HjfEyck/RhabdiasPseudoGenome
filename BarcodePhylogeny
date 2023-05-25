@@ -10,14 +10,12 @@ conda activate ncbi_env
 conda install -c bioconda entrez-direct
 
 
-#Fetch the sequences we will use
-esearch -db "protein" -query "(("Nematoda"[Organism] OR nematoda[All Fields]) AND cox1[All Fields]) AND (refseq[filter] AND mitochondrion[filter])" | efetch -format fasta > cox1_aa.fasta
+cd /srv/scratch/z5228384/RhabGenomePaper/COXphylogenetics
 
-#convert seequences into nucleotides
-pip3 install biopython
+# use macse to align sequences in a codon aware manner
+macse -prog alignSequences -seq CoX1Phylo.fasta -out_NT COX1_macse_NT.fasta -out_AA COX1_macse_AA.fasta -gc_def 5
 
-
-java -jar $MC/macse_v2.06.jar -prog alignSequences -seq COX1.fasta -out_NT COX1_macse_NT.fasta -out_AA COX1_macse_AA.fasta -gc_def 5
+clipkit COX1_macse_NT.fasta -o COX1_macse_NT_clipkit50.fa -g 0.5
 
 
-java -jar $BMGE/BMGE.jar -i COX1_macse_AA.fasta -t AA -m BLOSUM62 -of COX1_macse_BMGE_AA.fasta
+iqtree2 -s COX1_macse_NT_clipkit50.fa -T 8 -m MFP -B 10000 -bi 1000 -minsup .95 -nm 3500 -alrt 10000 --prefix COX1_macse_NT_clipkit50_BI1000_shalrt_10000_mfp
