@@ -99,3 +99,10 @@ input   filtered transcripts    final transcripts supported     final genes supp
 input0        12497                 4584                            4584
 input1        20475                 18066                           18066
 
+
+
+
+
+# first must extract seqs from agat
+
+busco -c 8 -i .fasta -l nematoda_odb10 --augustus -o RhabBuscoNEM -m prot
