@@ -36,3 +36,24 @@ GENOME=animal_mt.K115.complete.graph1.1.path_sequence.fasta
 pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid --verbose --changes --threads $PPN --fix indels 2>&1 | tee ${PREFIX}.log.tx
 # no changes were made by pilon
 
+
+
+# Produce circos plot for mtgenome
+# This is done after MITOS annotation
+# There are several nominal OH regions, removed weakly supported OH regions (based on signal from protein plots in MITOS output) that overlap coding genes
+# the OH regions are suggested OH regions
+# these were manually updated in the bed file for circos
+GENOME=sequence.fas-0
+BEDFILE=result_updated.bed
+NAME="circular"	
+GENOME_LENGTH=14400
+
+echo "chr1 - mito mito 0 $GENOME_LENGTH black" > mitochondrial_genome.txt
+
+cat $BEDFILE | sed "s/$NAME/mito/g" | sed "s/repeat_unit/IGNOREME/g" | cut -f 1,2,3,4 > Mitochondrial_elements.txt
+cat Mitochondrial_elements.txt | grep -v "IGNOREME" | grep -v "trn" > no_tRNA_Mitochondrial_elements.txt
+cat Mitochondrial_elements.txt | grep -v "IGNOREME" | grep "trn" > yes_tRNA_Mitochondrial_elements.txt
+
+##Circos needs the various *.conf files in the same directory.
+circos
+
