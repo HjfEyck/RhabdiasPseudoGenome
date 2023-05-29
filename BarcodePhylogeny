@@ -13,9 +13,31 @@ conda install -c bioconda entrez-direct
 cd /srv/scratch/z5228384/RhabGenomePaper/COXphylogenetics
 
 # use macse to align sequences in a codon aware manner
-macse -prog alignSequences -seq CoX1Phylo.fasta -out_NT COX1_macse_NT.fasta -out_AA COX1_macse_AA.fasta -gc_def 5
+java -jar $MAC/macse_v2.06.jar -prog alignSequences \
+-seq CoX1Phylo.fasta \
+-gc_def 5 \
+-out_NT COX1_macse2_NT.fasta \
+-out_AA COX1_macse2_AA.fasta 
 
+# this next code does a few housekeeping things on the alignment
+# preserve final stop codons (as they are expected)
+# internal stop codons replaced by "NNN"
+# replace unexpected internal frameshift codons by "---"
+# replace remaining frameshift characters (those at sequence extremities) by "-"
+# Get some stats on each position and sequence
+
+java -jar $MAC/macse_v2.06.jar exportAlignment \
+-align COX1_macse2_NT.fasta \
+-codonForInternalStop NNN \
+-codonForInternalFS --- \
+-charForRemainingFS - \
+-out_NT COX1_macse2_noFS_NT.fasta \
+-out_AA COX1_macse2_noFS_AA.fasta \
+-out_stat_per_site output_frequencies.csv \
+-out_stat_per_seq output_stats.csv 
+
+# Then trim any position with more than 50% gaps
 clipkit COX1_macse_NT.fasta -o COX1_macse_NT_clipkit50.fa -g 0.5
 
-
+# Now use IQtree2 to build the gene tree
 iqtree2 -s COX1_macse_NT_clipkit50.fa -T 8 -m MFP -B 10000 -bi 1000 -minsup .95 -nm 3500 -alrt 10000 --prefix COX1_macse_NT_clipkit50_BI1000_shalrt_10000_mfp
