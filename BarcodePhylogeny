@@ -25,7 +25,6 @@ java -jar $MAC/macse_v2.06.jar -prog alignSequences \
 # replace unexpected internal frameshift codons by "---"
 # replace remaining frameshift characters (those at sequence extremities) by "-"
 # Get some stats on each position and sequence
-
 java -jar $MAC/macse_v2.06.jar exportAlignment \
 -align COX1_macse2_NT.fasta \
 -codonForInternalStop NNN \
