@@ -132,7 +132,7 @@ cd HeadersShort
 # I want a cleaned alignment from haqesac, but I dont need a tree from it
 # I will build trees in iqtree2, I dont want to use fasttree, which is haqesacs way of tree building
 # specify gnspacc=F to stop it lengthening the species names and preventing blast from working
-# specify seqnr=F to stop it from removing sequences that are too similar. We dont want to do that here
+# specify seqnr=F to stop it from removing sequences that are too similar. We know each species is different, similarity between species is important information
 # specify unkspec=T so it doesnt skip unknown sequences
 # it will claim to have errors after each alignment, but this is only due to the fact we are not building trees and they can be ignored
 # It still prodices the cleaned alignment files despite these errors
