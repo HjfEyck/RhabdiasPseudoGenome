@@ -38,5 +38,8 @@ java -jar $MAC/macse_v2.06.jar -prog exportAlignment \
 # Then trim any position with more than 50% gaps
 trimal -in COX1_macse2_noFS_NT.fasta -gt 0.5 -fasta COX1_macse2_noFS_NT_trimal50.fasta
 
+# AMAS for alignment stats
+python $AMAS/AMAS.py summary -i COX1_macse2_noFS_NT_trimal50.fasta -f fasta -d dna
+
 # Now use IQtree2 to build the gene tree
 iqtree2 -s COX1_macse2_noFS_NT_trimal50_manual.fasta -T 8 -m MFP -B 10000 -bi 1000 -minsup .95 -nm 3500 -alrt 10000 --prefix COX1_macse2_nofs_NT_trimal50_BI1000_shalrt_10000_mfp
