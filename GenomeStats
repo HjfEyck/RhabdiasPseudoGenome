@@ -28,6 +28,12 @@ KAT=/srv/scratch/z5228384/tools/KAT-Release-2.4.1/scripts/kat
 $KAT/distanalysis.py 
 python $KAT/distanalysis.py pe_v_asm_test-main.mx
 
+#longreads
+ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PipelineSteps/fastas/Step_1_assembly.fasta
+
+kat comp -t 8 -o longread_kat $ONT $FAS
+
 ################ Genome size estimation with Genomescope2 ################
 # create conda environment for genomescope
 conda create --name genomescope_env
