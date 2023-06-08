@@ -94,15 +94,35 @@ number of detected genes: 12978
 number of detected transcripts: 12978
 
 # Merge annotations from braker and gemoma
-GeMoMa GAF g=Braker_annotation_with_attributes.gff g=GeMoMa_annotation_with_attributes.gff outdir=./
+GeMoMa GAF g=Braker_annotation_with_attributes.gff g=GeMoMa_annotation_with_attributes.gff outdir=GemMerge
 input   filtered transcripts    final transcripts supported     final genes supported
 input0        12497                 4584                            4584
 input1        20475                 18066                           18066
 
+# functional statistics with agat
+agat_sp_functional_statistics.pl -gff filtered_predictions.gff
+
+# extract seqs from agat
+agat_sp_extract_sequences.pl -g filtered_predictions.gff -f Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -p --table 5 -o filtered_predictions.fasta
+
+conda activate saaga_env
+module load python/3.7.4
+module load python/2.7.18
+module load kat
+module load r
+module load java/8u292-b10-openjdk
+module load bbmap
+module load blast-plus
+module load minimap2
+module load samtools
+module load mmseqs2
+
+export TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
+BLASTP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/swissprot/uniprot_sprot.fasta
+GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.gff
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.fasta
+python $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$BLASTP annotate=T assess=T summarise=T mmseqs=T longest=T forks=16 i=-1
 
 
-
-
-# first must extract seqs from agat
 
 busco -c 8 -i .fasta -l nematoda_odb10 --augustus -o RhabBuscoNEM -m prot
