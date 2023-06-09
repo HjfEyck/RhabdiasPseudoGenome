@@ -88,22 +88,79 @@ braker.pl --species Rpseudo --genome=$GENOME --esmode --softmasking --cores 20 -
 
 braker.pl --species=yourRhabdiasPseudo --genome=genome.fasta
 
+# use GAF to convert braker and gemoma to standardised format for merging
 GeMoMa AnnotationEvidence a=final_annotation.gff g=../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta
 number of detected CDS lines: 152174
 number of detected genes: 12978
 number of detected transcripts: 12978
 
 # Merge annotations from braker and gemoma
-GeMoMa GAF g=Braker_annotation_with_attributes.gff g=GeMoMa_annotation_with_attributes.gff outdir=GemMerge
-input   filtered transcripts    final transcripts supported     final genes supported
-input0        12497                 4584                            4584
-input1        20475                 18066                           18066
+agat_sp_merge_annotations.pl Braker_annotation_with_attributes.gff -gff ../GeMoMa_annotation_with_attributes.gff  -out AGATmerge.gff
+#output
+8874 overlapping cases found. For each case 2 loci have been merged within a single locus
+Among overlapping cases, 0 identical features have been removed.
+There is 276062 cds
+There is 43636 mrna
+There is 12744 start_codon
+There is 222 five_prime_utr
+There is 132 three_prime_utr
+There is 276062 exon
+There is 139550 intron
+There is 12838 stop_codon
+There is 22170 gene
+Formating output to GFF3
 
 # functional statistics with agat
 agat_sp_functional_statistics.pl -gff filtered_predictions.gff
 
 # extract seqs from agat
-agat_sp_extract_sequences.pl -g filtered_predictions.gff -f Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -p --table 5 -o filtered_predictions.fasta
+agat_sp_extract_sequences.pl -g AGATmerge.gff -f ../../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -p --table 1 -o AGATmerge.fasta
+
+# Using interproscan
+# Installing interproscan was annoying. First use conda to install
+conda install -c bioconda interproscan
+# then REMOVE the hmmer installation that COMES WITH INTERPROSCAN
+conda remove hmmer-3.1b1
+# then use an UP TO DATE version of hmmer, which interproscan REQUIRES
+module load hmmer/3
+
+
+
+# interproscan
+module load openjdk
+module load perl
+module load signalp
+module load tmhmm
+module load interproscan
+module load python
+
+
+cp AGATmerge.fasta AGATmerge_backup.fasta
+sed -i 's/\*//g' AGATmerge.fasta
+
+
+interproscan.sh -i AGATmerge.fasta \
+-cpu 4 \
+-t p \
+-T ./tmp \
+-iprlookup \
+-pa \
+-goterms \
+-dp \
+-appl TIGRFAM,SFLD,SUPERFAMILY,PANTHER,Gene3D,Hamap,ProSiteProfiles,Coils,SMART,CDD,PRINTS,ProSitePatterns,Pfam,MobiDBLite,PIRSF
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 conda activate saaga_env
 module load python/3.7.4
@@ -117,12 +174,44 @@ module load minimap2
 module load samtools
 module load mmseqs2
 
+# compare the Rhabdias proteome to the swissprot database 
 export TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 BLASTP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/swissprot/uniprot_sprot.fasta
-GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.gff
-FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.fasta
+GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.gff
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.fasta
+mkdir swissprot
+cd swissprot
 python $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$BLASTP annotate=T assess=T summarise=T mmseqs=T longest=T forks=16 i=-1
+cd ..
+SCARP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_carpocapsae_protein.faa
+PPAC=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/P_pacificus_protein.faa
+CNIGO=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_nigoni_protein.faa
+CBRIG=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_briggsae_protein.faa
+SRAT=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_ratti_protein.faa
+CELE=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_elegans.faa
+mkdir SRAT
+cd SRAT
+python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$SRAT annotate=T assess=T longest=T summarise=T forks=16 basefile=S_ratti i=-1 v=-1
+cd ..
+mdir SCARP
+cd SCARP
+python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$SCARP annotate=T assess=T longest=T summarise=T forks=16 basefile=S_carp i=-1 v=-1
+cd ..
+mkdir PPAC
+cd PPAC
+python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$PPAC annotate=T assess=T longest=T summarise=T forks=16 basefile=P_pac i=-1 v=-1
+cd ..
+mkdir CNIGO
+cd CNIGO
+python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CNIGO annotate=T assess=T longest=T summarise=T forks=16 basefile=C_nigoni i=-1 v=-1
+cd ..
+mkdir CBRIG
+cd CBRIG
+python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CBRIG annotate=T assess=T longest=T summarise=T forks=16 basefile=C_brigg i=-1 v=-1
+cd ..
+mkdir CELE
+cd CELE
+python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CELE annotate=T assess=T longest=T summarise=T forks=16 basefile=C_ele i=-1 v=-1
 
-
-
+# Busco scores for proteome
 busco -c 8 -i .fasta -l nematoda_odb10 --augustus -o RhabBuscoNEM -m prot
