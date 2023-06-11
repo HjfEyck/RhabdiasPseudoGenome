@@ -177,45 +177,57 @@ module load blast-plus
 module load minimap2
 module load samtools
 module load mmseqs2
-
 # compare the Rhabdias proteome to the swissprot database 
 export TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 BLASTP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/swissprot/uniprot_sprot.fasta
-GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.fasta.gff3
-FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.fasta
-mkdir swissprot
-cd swissprot
-python $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$BLASTP annotate=T assess=T summarise=T mmseqs=T longest=T forks=16 i=-1
-cd ..
+GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.gff
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.fasta
 SCARP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_carpocapsae_protein.faa
 PPAC=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/P_pacificus_protein.faa
 CNIGO=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_nigoni_protein.faa
 CBRIG=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_briggsae_protein.faa
 SRAT=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_ratti_protein.faa
 CELE=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_elegans.faa
+mkdir swissprot
 mkdir SRAT
+mkdir SCARP
+mkdir PPAC
+mkdir CNIGO
+mkdir CBRIG
+mkdir CELE
+#swissprot
+cd swissprot
+python $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$BLASTP annotate=T assess=T summarise=T mmseqs=T longest=T forks=16 i=-1
+cd ..
+#srati
 cd SRAT
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$SRAT annotate=T assess=T longest=T summarise=T forks=16 basefile=S_ratti i=-1 v=-1
 cd ..
-mkdir SCARP
+#scarp
 cd SCARP
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$SCARP annotate=T assess=T longest=T summarise=T forks=16 basefile=S_carp i=-1 v=-1
 cd ..
-mkdir PPAC
+#ppacificus
 cd PPAC
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$PPAC annotate=T assess=T longest=T summarise=T forks=16 basefile=P_pac i=-1 v=-1
 cd ..
-mkdir CNIGO
+#cnigoni
 cd CNIGO
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CNIGO annotate=T assess=T longest=T summarise=T forks=16 basefile=C_nigoni i=-1 v=-1
 cd ..
-mkdir CBRIG
+#cbrigg
 cd CBRIG
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CBRIG annotate=T assess=T longest=T summarise=T forks=16 basefile=C_brigg i=-1 v=-1
 cd ..
-mkdir CELE
+#celegans
 cd CELE
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CELE annotate=T assess=T longest=T summarise=T forks=16 basefile=C_ele i=-1 v=-1
 
 # Busco scores for proteome
-busco -c 8 -i .fasta -l nematoda_odb10 --augustus -o RhabBuscoNEM -m prot
+busco -c 20 -i AGATmerge.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
+busco -c 20 -i AGATmerge.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
+busco -c 20 -i AGATmerge.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
+
+busco -c 20 -i filtered_predictions.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
+busco -c 20 -i filtered_predictions.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
+busco -c 20 -i filtered_predictions.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
