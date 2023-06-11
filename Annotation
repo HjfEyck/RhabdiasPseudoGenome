@@ -134,13 +134,17 @@ module load tmhmm
 module load interproscan
 module load python
 
-
+# remove asterisks in the fasta file, interproscan doesnt work wih asteriks
 cp AGATmerge.fasta AGATmerge_backup.fasta
 sed -i 's/\*//g' AGATmerge.fasta
 
+# interproscan had to be loaded from here (https://interproscan-docs.readthedocs.io/en/latest/HowToDownload.html)
+# conda install would not work, nor would the installation on katana
 
-interproscan.sh -i AGATmerge.fasta \
--cpu 4 \
+module load java/11
+INTP=/srv/scratch/z5228384/tools/my_interproscan/interproscan-5.62-94.0
+$INTP/interproscan.sh -i AGATmerge.fasta \
+-cpu 20 \
 -t p \
 -T ./tmp \
 -iprlookup \
@@ -177,7 +181,7 @@ module load mmseqs2
 # compare the Rhabdias proteome to the swissprot database 
 export TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 BLASTP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/swissprot/uniprot_sprot.fasta
-GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.gff
+GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.fasta.gff3
 FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge.fasta
 mkdir swissprot
 cd swissprot
@@ -193,7 +197,7 @@ mkdir SRAT
 cd SRAT
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$SRAT annotate=T assess=T longest=T summarise=T forks=16 basefile=S_ratti i=-1 v=-1
 cd ..
-mdir SCARP
+mkdir SCARP
 cd SCARP
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$SCARP annotate=T assess=T longest=T summarise=T forks=16 basefile=S_carp i=-1 v=-1
 cd ..
