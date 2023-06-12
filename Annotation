@@ -111,36 +111,18 @@ There is 22170 gene
 Formating output to GFF3
 
 # functional statistics with agat
-agat_sp_functional_statistics.pl -gff filtered_predictions.gff
+agat_sp_functional_statistics.pl -gff AGATmerge.gff -g ../../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -o AGATmerge_stats
 
 # extract seqs from agat
 agat_sp_extract_sequences.pl -g AGATmerge.gff -f ../../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -p --table 1 -o AGATmerge.fasta
 
-# Using interproscan
-# Installing interproscan was annoying. First use conda to install
-conda install -c bioconda interproscan
-# then REMOVE the hmmer installation that COMES WITH INTERPROSCAN
-conda remove hmmer-3.1b1
-# then use an UP TO DATE version of hmmer, which interproscan REQUIRES
-module load hmmer/3
-
-
-
-# interproscan
-module load openjdk
-module load perl
-module load signalp
-module load tmhmm
-module load interproscan
-module load python
 
 # remove asterisks in the fasta file, interproscan doesnt work wih asteriks
-cp AGATmerge.fasta AGATmerge_backup.fasta
-sed -i 's/\*//g' AGATmerge.fasta
+cp AGATmerge_locimerge_isoform.fasta AGATmerge_locimerge_isoform_backup.fasta
+sed -i 's/\*//g' AGATmerge_locimerge_isoform.fasta
 
 # interproscan had to be loaded from here (https://interproscan-docs.readthedocs.io/en/latest/HowToDownload.html)
 # conda install would not work, nor would the installation on katana
-
 module load java/11
 INTP=/srv/scratch/z5228384/tools/my_interproscan/interproscan-5.62-94.0
 $INTP/interproscan.sh -i AGATmerge.fasta \
@@ -153,19 +135,7 @@ $INTP/interproscan.sh -i AGATmerge.fasta \
 -dp \
 -appl TIGRFAM,SFLD,SUPERFAMILY,PANTHER,Gene3D,Hamap,ProSiteProfiles,Coils,SMART,CDD,PRINTS,ProSitePatterns,Pfam,MobiDBLite,PIRSF
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# saaga for comparison
 conda activate saaga_env
 module load python/3.7.4
 module load python/2.7.18
@@ -180,8 +150,8 @@ module load mmseqs2
 # compare the Rhabdias proteome to the swissprot database 
 export TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 BLASTP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/swissprot/uniprot_sprot.fasta
-GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.gff
-FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/GemMerge/filtered_predictions.fasta
+GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge_stats/AGATmerge.gff
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge_stats/AGATmerge.fasta
 SCARP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_carpocapsae_protein.faa
 PPAC=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/P_pacificus_protein.faa
 CNIGO=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_nigoni_protein.faa
@@ -223,11 +193,12 @@ cd ..
 cd CELE
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CELE annotate=T assess=T longest=T summarise=T forks=16 basefile=C_ele i=-1 v=-1
 
+# retain only longest isoforms for busco
+agat_sp_keep_longest_isoform.pl -gff AGATmerge_locimerge.gff -o AGATmerge_locimerge_longestisoform.gff
+12565 L2 isoforms with CDS removed (shortest CDS)
 # Busco scores for proteome
-busco -c 20 -i AGATmerge.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
-busco -c 20 -i AGATmerge.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
-busco -c 20 -i AGATmerge.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
+busco -c 20 -i AGATmerge_locimerge_isoform.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
+busco -c 20 -i AGATmerge_locimerge_isoform.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
+busco -c 20 -i AGATmerge_locimerge_isoform.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
 
-busco -c 20 -i filtered_predictions.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
-busco -c 20 -i filtered_predictions.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
-busco -c 20 -i filtered_predictions.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
+
