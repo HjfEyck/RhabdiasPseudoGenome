@@ -11,7 +11,7 @@ bedtools maskfasta -soft -fi Step_8_FinalTidy.diploidocus.fasta.softmasked -bed 
 # Next step was to simplify the contigs names in the assembly, which is recommended by Braker2 https://github.com/Gaius-Augustus/BRAKER
 # Headers currently look like ">scaffold1288_size5585_pilon"
 sed 's/^>\(.*\)_size.*/>\1/' Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked.fasta > Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta
-#Headers now are only ">scaffold1288"
+#Headers now have been simplified to ">scaffold1288"
 
 # Now that repeats and NUMTs are masked in the assembly, we can annotate it using GeMoMa and braker
 
