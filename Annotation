@@ -110,23 +110,30 @@ There is 12838 stop_codon
 There is 22170 gene
 Formating output to GFF3
 
-# functional statistics with agat
-agat_sp_functional_statistics.pl -gff AGATmerge.gff -g ../../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -o AGATmerge_stats
-
-# extract seqs from agat
-agat_sp_extract_sequences.pl -g AGATmerge.gff -f ../../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -p --table 1 -o AGATmerge.fasta
-
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta
+agat_convert_sp_gxf2gxf.pl -gff AGATmerge.gff -o AGATmerge_clean.gff # clean the file
+agat_sp_add_start_and_stop.pl --gff AGATmerge_clean.gff --fasta $FAS --out AGATmerge_clean_startstop.gff # adds start and stop codons when a CDS feature exists
+agat_sp_filter_incomplete_gene_coding_models.pl --gff AGATmerge_clean_startstop.gff --fasta $FAS -o AGATmerge_clean_startstop_completefilter.gff
+# We checked 33361 mRNAs.
+# There are 0 mRNAs without start and stop codons.
+# There are 133 mRNAs without stop codons.
+# There are 220 mRNAs without start codons.
+# Number of gene affected: 353
+agat_sp_keep_longest_isoform.pl -gff AGATmerge_clean_startstop_completefilter.gff -o AGATmerge_clean_startstop_completefilter_longestisoforms.gff
+# 11002 L2 isoforms with CDS removed (shortest CDS)
+#extract sequences for interproscan
+agat_sp_extract_sequences.pl -g AGATmerge_clean_startstop_completefilter_longestisoforms.gff -f $FAS -p --table 1 -o AGATmerge_clean_startstop_completefilter_longestisoforms.fasta
 
 # remove asterisks in the fasta file, interproscan doesnt work wih asteriks
-cp AGATmerge_locimerge_isoform.fasta AGATmerge_locimerge_isoform_backup.fasta
-sed -i 's/\*//g' AGATmerge_locimerge_isoform.fasta
+cp AGATmerge_clean_startstop_completefilter_longestisoforms.fasta AGATmerge_clean_startstop_completefilter_longestisoforms.fasta_backup.fasta
+sed -i 's/\*//g' AGATmerge_clean_startstop_completefilter_longestisoforms.fasta
 
 # interproscan had to be loaded from here (https://interproscan-docs.readthedocs.io/en/latest/HowToDownload.html)
 # conda install would not work, nor would the installation on katana
 module load java/11
 INTP=/srv/scratch/z5228384/tools/my_interproscan/interproscan-5.62-94.0
-$INTP/interproscan.sh -i AGATmerge.fasta \
--cpu 20 \
+$INTP/interproscan.sh -i AGATmerge_clean_startstop_completefilter_longestisoforms.fasta \
+-cpu 16 \
 -t p \
 -T ./tmp \
 -iprlookup \
@@ -134,6 +141,15 @@ $INTP/interproscan.sh -i AGATmerge.fasta \
 -goterms \
 -dp \
 -appl TIGRFAM,SFLD,SUPERFAMILY,PANTHER,Gene3D,Hamap,ProSiteProfiles,Coils,SMART,CDD,PRINTS,ProSitePatterns,Pfam,MobiDBLite,PIRSF
+
+
+agat_sp_manage_functional_annotation.pl # rename with interproscan results
+# functional statistics with agat
+agat_sp_functional_statistics.pl -gff AGATmerge.gff -g ../../Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta -o AGATmerge_stats
+
+
+
+
 
 # saaga for comparison
 conda activate saaga_env
