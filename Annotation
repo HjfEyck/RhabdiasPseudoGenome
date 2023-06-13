@@ -13,7 +13,7 @@ bedtools maskfasta -soft -fi Step_8_FinalTidy.diploidocus.fasta.softmasked -bed 
 sed 's/^>\(.*\)_size.*/>\1/' Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked.fasta > Step_8_FinalTidy.diploidocus_repmasked_numtmasked_softMasked_cleanHeaders.fasta
 #Headers now have been simplified to ">scaffold1288"
 
-# Now that repeats and NUMTs are masked in the assembly, we can annotate it using GeMoMa and braker
+# Now that repeats and NUMTs are masked in the assembly, we can annotate the remaining sequences using GeMoMa and braker
 
 #First GeMoMa
 #Navigate to working directory
