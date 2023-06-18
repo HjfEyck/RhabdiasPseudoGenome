@@ -162,18 +162,17 @@ module load bbmap
 module load blast-plus
 module load minimap2
 module load samtools
-module load mmseqs2
 # compare the Rhabdias proteome to the swissprot database 
 export TOOLS="/srv/scratch/z5228384/SLiMSuite/tools/"
 BLASTP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/swissprot/uniprot_sprot.fasta
-GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge_stats/AGATmerge.gff
-FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGATmergeAnnotation/AGATmerge/AGATmerge_stats/AGATmerge.fasta
-SCARP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_carpocapsae_protein.faa
-PPAC=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/P_pacificus_protein.faa
-CNIGO=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_nigoni_protein.faa
-CBRIG=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_briggsae_protein.faa
-SRAT=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/S_ratti_protein.faa
-CELE=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/saaga/refNemProteomes/C_elegans.faa
+GF=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGAT/AGATmerge_clean_startstop_completefilter_longestisoforms.gff
+FAS=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/AGAT/AGATmerge_clean_startstop_completefilter_longestisoforms.fasta
+SCARP=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/old/saaga/refNemProteomes/S_carpocapsae_protein.faa
+PPAC=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/old/saaga/refNemProteomes/P_pacificus_protein.faa
+CNIGO=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/old/saaga/refNemProteomes/C_nigoni_protein.faa
+CBRIG=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/old/saaga/refNemProteomes/C_briggsae_protein.faa
+SRAT=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/old/saaga/refNemProteomes/S_ratti_protein.faa
+CELE=/srv/scratch/z5228384/RhabGenomePaper/PostAssembly/Anottation/old/saaga/refNemProteomes/C_elegans.faa
 mkdir swissprot
 mkdir SRAT
 mkdir SCARP
@@ -209,12 +208,10 @@ cd ..
 cd CELE
 python2 $TOOLS/saaga.py seqin=$FAS gffin=$GF refprot=$CELE annotate=T assess=T longest=T summarise=T forks=16 basefile=C_ele i=-1 v=-1
 
-# retain only longest isoforms for busco
-agat_sp_keep_longest_isoform.pl -gff AGATmerge_locimerge.gff -o AGATmerge_locimerge_longestisoform.gff
-12565 L2 isoforms with CDS removed (shortest CDS)
+
 # Busco scores for proteome
-busco -c 20 -i AGATmerge_locimerge_isoform.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
-busco -c 20 -i AGATmerge_locimerge_isoform.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
-busco -c 20 -i AGATmerge_locimerge_isoform.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
+busco -c 16 -i AGATmerge_clean_startstop_completefilter_longestisoforms.fasta -l nematoda_odb10 --augustus -o RhabBuscoprotNEM -m prot
+busco -c 16 -i AGATmerge_clean_startstop_completefilter_longestisoforms.fasta -l eukaryota_odb10 --augustus -o RhabBuscoprotEUK -m prot
+busco -c 16 -i AGATmerge_clean_startstop_completefilter_longestisoforms.fasta -l metazoa_odb10 --augustus -o RhabBuscoprotMET -m prot
 
 
