@@ -39,6 +39,7 @@ pilon --bam $BAM --genome $GENOME --output $PREFIX --outdir $PREFIX/ --diploid -
 
 
 # Produce circos plot for mtgenome
+https://dbsloan.github.io/TS2019/exercises/circos.html
 # This is done after MITOS annotation
 # There are several nominal OH regions, removed weakly supported OH regions (based on signal from protein plots in MITOS output) that overlap coding genes
 # the OH regions are suggested OH regions
