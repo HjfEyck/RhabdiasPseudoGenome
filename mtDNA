@@ -55,6 +55,10 @@ cat $BEDFILE | sed "s/$NAME/mito/g" | sed "s/repeat_unit/IGNOREME/g" | cut -f 1,
 cat Mitochondrial_elements.txt | grep -v "IGNOREME" | grep -v "trn" > no_tRNA_Mitochondrial_elements.txt
 cat Mitochondrial_elements.txt | grep -v "IGNOREME" | grep "trn" > yes_tRNA_Mitochondrial_elements.txt
 
+#mtdna gc%
+GCcalc.py -f animal_mt.K115.complete.graph1.1.path_sequence.fasta -w 100 -s 100 > output.txt
+# then remove 4th column from output file 
+
 ##Circos needs the various *.conf files in the same directory.
 circos
 
