@@ -1,25 +1,20 @@
+# useful site to help interpret results http://www.eilersgenomics.com/genome_quality/
+
 ################ meryl and merqury to assess assembly quality ################
 
 best_k.sh 253300479 # genome size is largest estimate from depthsizer 
 # result = kmer=18.9674
 # Round up to 19
 
-READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
-export PATH=/srv/scratch/z5228384/tools/meryl-1.4/bin:$PATH
-meryl k=19 count output F.meryl $READS/Rhab_forward.fastq.gz memory=200 threads=24
-meryl k=19 count output R.meryl $READS/Rhab_reverse.fastq.gz memory=200 threads=24
-# comine forward ad reverse 
-meryl union-sum output rhab.meryl *.meryl memory=200 threads=24
+conda activate merq2_env
+conda install -c conda-forge -c bioconda merqury
+module load java/11
+cd /srv/scratch/z5228384/RhabGenomePaper/Reads/IlluminaReads
+mkdir merq
+# count kmers using best kmer size
+meryl k=19 count ToadRem* output merq/ToadRem.meryl threads=20
 # run merqury
-$MERQURY/merqury.sh rhab.meryl $GENOME step8
-MERYLDB=rhab.meryl
-ASSEMBLY=Step_8_FinalTidy.diploidocus.fasta
-PREFIX=FUKU
-$MERQURY/eval/spectra-cn.sh $(basename $MERYLDB) $ASSEMBLY $PREFIX
-
-$MERQURY/eval/spectra-cn.sh $(basename $MERYLDB) $ASSEMBLY $PREFIX
-mv completeness.stats $PREFIX.completeness.stats
-cat $PREFIX.completeness.stats $PREFIX.q
+merqury.sh ToadRem.meryl $GENOME MERQ
 
 ################ Kmer Analysis Toolkit to assess assembly quality based on raw reads ################
 # Generate kat comp spectra plot with the raw reads compared to the assembly
@@ -28,11 +23,28 @@ KAT=/srv/scratch/z5228384/tools/KAT-Release-2.4.1/scripts/kat
 $KAT/distanalysis.py 
 python $KAT/distanalysis.py pe_v_asm_test-main.mx
 
-#longreads
-ONT=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
-FAS=/srv/scratch/z5228384/RhabGenomePaper/PipelineSteps/fastas/Step_1_assembly.fasta
+################ Inspector to assess longread asssembly ################
 
-kat comp -t 8 -o longread_kat $ONT $FAS
+GENOME=/srv/scratch/z5228384/RhabGenomePaper/GenomeStats/Step_8_FinalTidy.diploidocus.fasta
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+cd /srv/scratch/z5228384/RhabGenomePaper/GenomeStats/inspector
+inspector.py \
+    -c $GENOME \
+    -r $READS \
+    -o ./ \
+    --datatype nanopore \
+    -t 20
+
+# on original assembly (no polishing or anything else)
+GENOME=/srv/scratch/z5228384/RhabGenomePaper/PipelineSteps/fastas/Step_1_assembly.fasta
+READS=/srv/scratch/z5228384/RhabGenomePaper/Reads/ONTreads/rhabont_allreads_5000.fastq.gz
+cd /srv/scratch/z5228384/RhabGenomePaper/GenomeStats/inspector
+inspector.py \
+    -c $GENOME \
+    -r $READS \
+    -o ./ \
+    --datatype nanopore \
+    -t 20
 
 ################ Genome size estimation with Genomescope2 ################
 # create conda environment for genomescope
