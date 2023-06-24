@@ -167,7 +167,7 @@ sort -k2 result.txt | head
 # it will estimate a separate model for each partition
 iqtree2 -p ./HAQESAC --prefix concat -bi 100 -B 1000 -T 24 -m MFP+MERGE --symtest-remove-bad
 #generate gene trees
-iqtree2 -S ./400min --prefix gene -T 24
+iqtree2 -S ./HAQESAC --prefix genetrees -T 24 --symtest-remove-bad
 #generate gene concordance factors
 iqtree2 -t concat.treefile --gcf gene.treefile --prefix concord -T 24
 #generate site concordance factors
