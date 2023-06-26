@@ -114,7 +114,7 @@ cat *_${line}.faa > /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSin
 done<final_busco_ids.txt
 
 # next came alignment and tree building for each sequence. for this we can use haqesac, a slimsuite tool
-Here we can reuse the environment made for diploidocus, because it is a slimsuite tool too
+# Here we can reuse the environment made for diploidocus, because it is a slimsuite tool too
 conda activate dip_env
 cd /srv/scratch/z5228384/RhabGenomePaper/Phylogenomics/FinalSingleCopy/9aa
 SLIM=/srv/scratch/z5228384/SLiMSuite/tools
