@@ -179,7 +179,7 @@ iqtree2 -te concat.treefile -s ./400min -T 24 --scfl 100 --prefix concord2 -blfi
 # parallelise modelfinder for IQTREE
 # 
 mkdir output
-find *.fasta | parallel --bar 'iqtree -s {} -m MF -msub nuclear -pre output/{}'  
+find *.fas | parallel --bar 'iqtree2 -p {} -m MFP+MERGE --symtest-remove-bad -pre output/{}'  
 
 
 
