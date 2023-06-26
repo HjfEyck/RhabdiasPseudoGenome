@@ -180,3 +180,18 @@ iqtree2 -te concat.treefile -s ./400min -T 24 --scfl 100 --prefix concord2 -blfi
 # 
 mkdir output
 find *.fasta | parallel --bar 'iqtree -s {} -m MF -msub nuclear -pre output/{}'  
+
+
+
+#generate gene trees
+iqtree2 -S ./HAQESAC --prefix genetrees -T 24 --symtest-remove-bad
+# in astral
+java -jar $AST/astral.5.7.1.jar -i genetrees3.treefile -o astral.tre -t 3
+# generate gcf files
+iqtree2 -t astral.tre --gcf genetrees3.treefile --prefix gene_concordance -T 24
+
+#split genetrees into single trees
+csplit -f tree -s -z genetrees3.treefile "/) *;/" "{*}"
+
+
+
