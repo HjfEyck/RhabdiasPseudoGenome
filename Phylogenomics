@@ -165,16 +165,21 @@ sort -k2 result.txt | head
 #create reference tree 
 # All alignments are stored in a folder called HAQESAC, we use -p to indicate that each alignment is its own partition in the broader analysis
 # it will estimate a separate model for each partition
-iqtree2 -p ./HAQESAC --prefix concat -bi 100 -B 1000 -T 24 -m MFP+MERGE --symtest-remove-bad
+iqtree2 -p ../HAQESAC/norhab/ --prefix concat_simple_norhab -bi 100 -B 1000 -T 28 --symtest-remove-bad
 #generate gene trees
 iqtree2 -S ./HAQESAC --prefix genetrees -T 24 --symtest-remove-bad
 #generate gene concordance factors
 iqtree2 -t concat.treefile --gcf gene.treefile --prefix concord -T 24
 #generate site concordance factors
+iqtree2 -te concat_simple_norhab.treefile -s ../HAQESAC/norhab/ --scfl 100 --prefix scf
+
+
 tail concat.log #get model parameters from reference tree
 iqtree2 -te concat.treefile -s ./400min -T 24 --scfl 100 --prefix concord2 -blfix -m "Q.plant+I{0.177536}+R8{0.147295,0.0935335,0.114418,0.190578,0.108376,0.538389,0.113777,0.804005,0.0898871,1.30004,0.137297,1.95653,0.0958285,3.48597,0.0155849,6.09904}"
 -te concat.treefile -s ./400min -T 24 --scfl 100 --prefix scfconcord/iqtree2 -te concat.treefile -s ./400min -T 24 --scfl 100 --prefix scfconcord
 
+#first had to remove all the alignments that failed symtest int folder called bad, or the alignment wont match the ML tree
+iqtree2 -te concat_simple_norhab.treefile -s ../HAQESAC/norhab/ --scfl 100 --prefix scf  -T 28 --symtest-remove-bad
 
 # parallelise modelfinder for IQTREE
 # 
