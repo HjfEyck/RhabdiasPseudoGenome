@@ -69,7 +69,7 @@ seqtk subseq InitialFlyeAssembly.fasta seqsToKeep.txt > BlobCleaned_Flye_Assembl
 #Check the correct contigs were removed
 grep ">" BlobCleaned_Flye_Assembly.fasta | cut -c2- > CleanedFastaNames.txt
 
-#for my own posterity, (so I dont have to learn it again) an explanation of the sed command used above
+#for my own posterity, an explanation of the sed command used above
 The -n flag suppresses the default output of sed, so we only print lines that match our pattern.
 The -E flag enables extended regular expression syntax.
 /\b(Nematoda|no-hit)\b/ is the pattern we are matching. \b matches a word boundary, so we only match lines where "Nematoda" or "no-hit" is a complete word.
