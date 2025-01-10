@@ -1,0 +1,46 @@
+#Remove contigs identified as contaminant organisms, the two contigs ID'd as microsporidians (scaffold622_size203594_pilon, scaffold647_size107554_pilon) were put in a list
+seqkit grep -v -f contigs_to_remove.txt $FASTA > Assembly_filtered.fasta
+
+#Then we remove contigs identified as adaptors
+#Run fcsadaptor to identify adaptors
+#Using fcs-genome/0.5.4 with the requirements: squashfuse/0.5.0 apptainer/1.3.3 python/3.9.4
+run_fcsadaptor.sh --fasta-input $FASTA --output-dir ./vecround1/ --euk --debug
+
+#To trim all adaptors, including internal, we ran. It will split contigs at internal adaptors
+cat $FASTA | fcs.py clean genome --action-report ./vecround1/fcs_adaptor_report.txt --output cleaned.fasta --contam-fasta-out contam.fasta
+
+# Then remove sequences that are smaller than 5000bp
+#seqkit/2.7.0
+seqkit seq -m 5000 --line-width 0 cleaned.fasta > filtered.fasta
+
+#Then shorten sequence names, because vecscreen will hilariously fail if sequence names are greater than 50 characters
+python
+from Bio import SeqIO
+
+input_file = "filtered.fasta"
+output_file = "shortened.fasta"
+
+with open(output_file, "w") as output:
+    for i, record in enumerate(SeqIO.parse(input_file, "fasta")):
+        record.id = f"seq{i+1}"  # Replace with sequential ID
+        record.description = ""  # Remove any additional description
+        SeqIO.write(record, output, "fasta")
+
+#Then run again to check no more adaptor filtering necessary.
+run_fcsadaptor.sh --fasta-input shortened.fasta --output-dir ./vecround2/ --euk --debug
+
+Then final BUSCO run to ensure no loss of Nematode contigs
+module load busco/5.2.2 bioref prodigal/2.6.3 ncbi-datasets python/3.9.4 blast+/2.11.0 metaeuk/5 hmmer/3.4.0
+busco --in Final_shortened.fasta --augustus -l nematoda_odb10 -o busco_out --mode geno --cpu 16 -f --force --config /apps/busco/5.2.2/config/config.ini --offline
+
+        --------------------------------------------------
+        |Results from dataset nematoda_odb10              |
+        --------------------------------------------------
+        |C:86.1%[S:84.2%,D:1.9%],F:2.4%,M:11.5%,n:3131    |
+        |2697   Complete BUSCOs (C)                       |
+        |2637   Complete and single-copy BUSCOs (S)       |
+        |60     Complete and duplicated BUSCOs (D)        |
+        |76     Fragmented BUSCOs (F)                     |
+        |358    Missing BUSCOs (M)                        |
+        |3131   Total BUSCO groups searched               |
+        --------------------------------------------------
